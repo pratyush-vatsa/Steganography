@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Steganography Quiz - Test Your Knowledge</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css" rel="stylesheet" id="prism-dark-theme" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" rel="stylesheet" id="prism-light-theme" disabled />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/toolbar/prism-toolbar.min.css" rel="stylesheet" />
+
+    <!-- Full CSS from other pages -->
+    <style>
+        /* --- Base & Variables --- */
+        :root {
+            --primary: #4f46e5;
+            --primary-light: #818cf8;
+            --primary-dark: #3730a3;
+            --secondary: #06b6d4;
+            --accent: #f472b6;
+            --dark: #1e293b; /* Dark text / Light BG element */
+            --light: #f8fafc; /* Light text / Dark BG element */
+            --bg-light: #f8fafc;
+            --bg-dark: #0f172a;
+            --card-bg-light: rgba(255, 255, 255, 0.95);
+            --card-bg-dark: rgba(30, 41, 59, 0.9);
+            --card-border-light: rgba(79, 70, 229, 0.1);
+            --card-border-dark: rgba(129, 140, 248, 0.15);
+            --code-bg-light: #f8f8f2;
+            --code-bg-dark: #282a36;
+            --input-bg: rgba(255, 255, 255, 0.05);
+             --input-text: var(--light);
+             --border-color: var(--card-border-dark); /* Default dark */
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --gradient: linear-gradient(135deg, var(--primary), var(--secondary));
+            --text-light: #64748b;
+            --text-dark: var(--dark);
+            --warning: #f97316;
+            --error: #ef4444;
+            --success: #22c55e;
+            --medium-text: #a0a0b0;
+            --button-radius: 8px;
+            --card-radius: 12px;
+            --transition: all 0.3s ease-in-out;
+            --header-height: 80px;
+        }
+        /* --- Dark Mode Overrides --- */
+        html[data-theme="dark"] {
+            --primary: #818cf8; --primary-light: #a5b4fc; --primary-dark: #6366f1; --secondary: #22d3ee; --accent: #f9a8d4; --dark: #f8fafc; --light: #0f172a; --bg-main: var(--bg-dark); --text-main: var(--dark); --text-muted: #94a3b8; --card-bg: var(--card-bg-dark); --card-border: var(--card-border-dark); --code-bg: var(--code-bg-dark); --container-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.3); --warning: #fb923c; --error: #f87171; --success: #4ade80; --input-bg: rgba(255, 255, 255, 0.05); --input-text: var(--light); --border-color: var(--card-border-dark); --medium-text: #94a3b8;
+        }
+         /* Light Mode Explicit Overrides */
+         html[data-theme="light"] {
+             --primary: #6366f1; --primary-light: #818cf8; --secondary: #06b6d4; --accent: #f472b6; --dark: #1e293b; --light: #f8fafc; --bg-main: var(--bg-light); --text-main: var(--text-dark); --text-muted: var(--text-light); --card-bg: var(--card-bg-light); --card-border: var(--card-border-light); --code-bg: var(--code-bg-light); --input-bg: rgba(241, 245, 249, 0.9); --input-text: #334155; --border-color: var(--card-border-light); --medium-text: #64748b; --warning: #f97316; --error: #ef4444; --success: #22c55e; --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+         }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; scroll-padding-top: calc(var(--header-height) + 20px); }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-main); color: var(--text-main); font-size: 16px; line-height: 1.7; transition: background-color 0.4s ease, color 0.4s ease; overflow-x: hidden; }
+        .page-wrapper { display: flex; flex-direction: column; min-height: 100vh; }
+        .content-wrapper { flex: 1; }
+        .main-content { flex: 1; padding: 0 2rem; max-width: 900px; margin: 0 auto; } /* Narrower for quiz */
+        .container { width: 100%; margin: 0 auto; }
+        .bg-pattern { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; opacity: 0.05; pointer-events: none; background-image: radial-gradient(var(--primary) 0.5px, transparent 0.5px); background-size: 25px 25px; transition: opacity 0.4s ease; }
+        html[data-theme="dark"] .bg-pattern { opacity: 0.07; background-image: radial-gradient(var(--primary-light) 0.5px, transparent 0.5px); }
+        header { padding: 1.5rem 2rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background-color: var(--card-bg); backdrop-filter: blur(12px); z-index: 50; transition: background-color 0.4s ease, border-color 0.4s ease; height: var(--header-height); }
+        .logo { display: flex; align-items: center; gap: 1rem; }
+        .logo h1 { font-size: 1.8rem; font-weight: 700; background: var(--gradient); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .logo-icon { font-size: 2rem; color: var(--primary); animation: pulse 2.5s infinite ease-in-out; }
+        .header-buttons { display: flex; gap: 0.8rem; align-items: center; }
+        .theme-toggle { background: transparent; border: 1px solid var(--border-color); color: var(--medium-text); padding: 0.6rem 1.1rem; border-radius: 50px; cursor: pointer; display: flex; align-items: center; gap: 0.6rem; font-weight: 500; transition: all 0.3s ease; font-size: 0.9rem; }
+        .theme-toggle:hover { color: var(--primary); border-color: var(--primary); background-color: rgba(79, 70, 229, 0.05); }
+        html[data-theme="dark"] .theme-toggle:hover { background-color: rgba(129, 140, 248, 0.08); }
+        .theme-toggle i { width: 1em; text-align: center; }
+        .return-button { display: inline-flex; align-items: center; gap: 0.6rem; background: transparent; border: 1px solid var(--border-color); color: var(--medium-text); padding: 0.6rem 1.1rem; border-radius: 50px; text-decoration: none; font-weight: 500; transition: all 0.3s ease; font-size: 0.9rem; }
+        .return-button:hover { color: var(--secondary); border-color: var(--secondary); background-color: rgba(6, 182, 212, 0.05); }
+        html[data-theme="dark"] .return-button:hover { background-color: rgba(34, 211, 238, 0.08); }
+        .return-button i { font-size: 0.9em; }
+        .section { padding: 2.5rem; margin: 2.5rem 0; background: var(--card-bg); border-radius: 1rem; box-shadow: var(--shadow-md); transition: all 0.4s ease; border: 1px solid var(--border-color); }
+        .section-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem;}
+        .section-header h2 { font-size: 2rem; font-weight: 700; color: var(--primary); margin: 0; }
+        .section-header i { font-size: 1.5rem; color: var(--primary); background-color: rgba(79, 70, 229, 0.1); width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        html[data-theme="dark"] .section-header i { background-color: rgba(129, 140, 248, 0.15); }
+        .section > p:first-of-type { font-size: 1.1rem; color: var(--text-muted); margin-bottom: 1.5rem; }
+        button, .button { background: var(--gradient); color: white; border: none; padding: 0.9rem 1.8rem; border-radius: var(--button-radius); font-weight: 600; cursor: pointer; transition: var(--transition); display: inline-flex; align-items: center; justify-content: center; gap: 0.6rem; font-size: 0.95rem; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); text-decoration: none; line-height: 1; }
+        button:hover, .button:hover { transform: translateY(-2px); box-shadow: 0 7px 20px rgba(79, 70, 229, 0.4); }
+        html[data-theme="dark"] button:hover, html[data-theme="dark"] .button:hover { box-shadow: 0 7px 20px rgba(129, 140, 248, 0.4); }
+        button:active, .button:active { transform: translateY(0); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); }
+        button.secondary, .button.secondary { background: transparent; border: 1px solid var(--border-color); color: var(--medium-text); box-shadow: none; padding: 0.7rem 1.2rem; }
+        button.secondary:hover, .button.secondary:hover { border-color: var(--primary); color: var(--primary); background: rgba(79, 70, 229, 0.1); transform: none; box-shadow: none; }
+        html[data-theme="dark"] button.secondary:hover, html[data-theme="dark"] .button.secondary:hover { background: rgba(129, 140, 248, 0.15); }
+        button:disabled, .button:disabled { background: var(--input-bg); color: var(--medium-text); cursor: not-allowed; box-shadow: none; opacity: 0.6; transform: none; }
+        html[data-theme="light"] button:disabled, html[data-theme="light"] .button:disabled { background: #e2e8f0; }
+        footer { margin-top: 6rem; text-align: center; padding: 3rem 2rem; color: var(--text-muted); opacity: 0.9; font-size: 0.95rem; border-top: 1px solid var(--border-color); background-color: var(--card-bg); transition: background-color 0.4s ease, border-color 0.4s ease; }
+        .footer-content { max-width: 800px; margin: 0 auto; }
+        .footer-links { display: flex; justify-content: center; gap: 2rem; margin-top: 1rem; flex-wrap: wrap; }
+        .footer-links a { color: var(--text-muted); text-decoration: none; transition: color 0.3s ease; display: inline-flex; align-items: center; gap: 0.5rem; }
+        .footer-links a:hover { color: var(--primary); }
+        .footer-links a i { margin-right: 0.5em; }
+        .back-to-top { position: fixed; bottom: 30px; right: 30px; width: 50px; height: 50px; border-radius: 50%; background: var(--primary); color: white; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: all 0.4s ease; transform: translateY(100px) scale(0.8); opacity: 0; border: none; box-shadow: var(--shadow-lg); z-index: 100; font-size: 1.2rem; }
+        .back-to-top.show { transform: translateY(0) scale(1); opacity: 1; }
+        .back-to-top:hover { background: var(--primary-light); transform: translateY(-5px) scale(1.05); }
+        .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0; }
+        @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.05); opacity: 0.9; } 100% { transform: scale(1); opacity: 1; } }
+
+        /* === QUIZ SPECIFIC STYLES === */
+        #quiz-container {
+            background-color: var(--card-bg);
+            padding: 2rem 2.5rem;
+            border-radius: var(--card-radius);
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-color);
+        }
+
+        #question-number {
+            font-size: 0.9rem;
+            color: var(--medium-text);
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        #question-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 2rem;
+            line-height: 1.5;
+        }
+
+        #answer-options {
+            display: grid;
+            grid-template-columns: 1fr; /* Single column for options */
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .answer-option {
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            padding: 1rem 1.2rem;
+            border-radius: var(--button-radius);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 1rem;
+        }
+         .answer-option input[type="radio"] {
+             accent-color: var(--primary); /* Style the radio button itself */
+             width: 18px;
+             height: 18px;
+             cursor: pointer;
+             flex-shrink: 0;
+         }
+         .answer-option label {
+             cursor: pointer;
+             flex-grow: 1;
+         }
+
+
+        .answer-option:hover {
+            background-color: rgba(129, 140, 248, 0.1); /* Use primary color hint */
+            border-color: var(--primary-light);
+        }
+        html[data-theme="light"] .answer-option:hover {
+             background-color: rgba(99, 102, 241, 0.08);
+        }
+
+        /* Styles during feedback */
+        .answer-option.selected {
+            border-color: var(--primary);
+            background-color: rgba(79, 70, 229, 0.15);
+        }
+        html[data-theme="dark"] .answer-option.selected {
+             background-color: rgba(129, 140, 248, 0.2);
+        }
+
+        .answer-option.correct {
+            border-color: var(--success);
+            background-color: rgba(34, 197, 94, 0.15);
+            color: var(--success);
+            font-weight: 600;
+        }
+        html[data-theme="dark"] .answer-option.correct {
+             background-color: rgba(74, 222, 128, 0.15);
+             color: var(--success)
+        }
+         html[data-theme="light"] .answer-option.correct {
+              color: #15803d; /* Darker green for light mode */
+         }
+
+
+        .answer-option.incorrect {
+            border-color: var(--error);
+            background-color: rgba(239, 68, 68, 0.1);
+             color: var(--error); /* Keep text color readable */
+             opacity: 0.8;
+        }
+         html[data-theme="dark"] .answer-option.incorrect {
+             background-color: rgba(248, 113, 113, 0.15);
+         }
+
+        .answer-option.disabled {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        #feedback {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            border-radius: var(--button-radius);
+            font-weight: 500;
+            display: none; /* Hidden initially */
+            text-align: center;
+        }
+        #feedback.correct {
+            background-color: rgba(34, 197, 94, 0.1);
+            color: var(--success);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+         html[data-theme="light"] #feedback.correct { color: #15803d; }
+
+        #feedback.incorrect {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--error);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+         html[data-theme="light"] #feedback.incorrect { color: #b91c1c; }
+
+        #quiz-navigation {
+            margin-top: 2rem;
+            display: flex;
+            justify-content: center;
+        }
+
+         #quiz-results {
+            text-align: center;
+            display: none; /* Hidden initially */
+         }
+          #quiz-results h3 {
+             font-size: 1.5rem;
+             color: var(--primary);
+             margin-bottom: 1rem;
+          }
+           #score {
+             font-size: 1.8rem;
+             font-weight: bold;
+             margin-bottom: 1.5rem;
+           }
+           #score-percentage {
+               font-size: 1.2rem;
+               color: var(--medium-text);
+               margin-bottom: 2rem;
+           }
+
+           /* Responsive Quiz */
+           @media (max-width: 768px) {
+                #quiz-container { padding: 1.5rem; }
+                #question-text { font-size: 1.1rem; }
+                .answer-option { padding: 0.8rem 1rem; font-size: 0.95rem; }
+           }
+
+    </style>
+</head>
+<body>
+    <div class="bg-pattern"></div>
+    <div class="page-wrapper">
+        <!-- Header -->
+        <header>
+            <div class="logo">
+                <i class="fas fa-question-circle logo-icon"></i> <!-- Changed icon -->
+                <h1>Steganography Quiz</h1>
+            </div>
+            <div class="header-buttons">
+                <a href="/explanation" class="return-button" title="Return to Documentation">
+                    <i class="fas fa-book" aria-hidden="true"></i>
+                    <span class="sr-only">Return to Docs</span>
+                </a>
+                <button class="theme-toggle" id="themeToggle" title="Toggle Theme">
+                    <i class="fas fa-moon" aria-hidden="true"></i>
+                    <span class="sr-only">Toggle Theme</span>
+                </button>
+            </div>
+        </header>
+
+        <div class="content-wrapper">
+            <main class="main-content">
+                <div class="container">
+                    <section id="quiz-section" class="section">
+                        <div class="section-header">
+                            <i class="fas fa-graduation-cap"></i>
+                            <h2>Test Your Knowledge</h2>
+                        </div>
+                        <p>See how much you've learned about steganography concepts.</p>
+
+                        <div id="quiz-container">
+                            <div id="quiz-active">
+                                <div id="question-number">Question 1 / X</div>
+                                <h3 id="question-text">Loading question...</h3>
+                                <div id="answer-options">
+                                    <!-- Options populated by JS -->
+                                </div>
+                                <div id="feedback"></div>
+                                <div id="quiz-navigation">
+                                    <button id="next-button" disabled>Select an answer</button>
+                                </div>
+                            </div>
+
+                            <div id="quiz-results">
+                                <h3>Quiz Complete!</h3>
+                                <p id="score">Your Score: 0 / 0</p>
+                                <p id="score-percentage">(0%)</p>
+                                <button id="restart-button"><i class="fas fa-redo"></i> Restart Quiz</button>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </main>
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <div class="footer-content">
+                <p>Steganography Quiz © 2024</p>
+                 <div class="footer-links">
+                   <a href="/explanation"><i class="fas fa-book-open" aria-hidden="true"></i> Documentation</a>
+                   <a href="/demos"><i class="fas fa-flask" aria-hidden="true"></i> Demos</a>
+                   <a href="/flowchart"><i class="fas fa-sitemap" aria-hidden="true"></i> Flowchart</a>
+                   <a href="/resources"><i class="fas fa-book-reader" aria-hidden="true"></i> Resources</a>
+                </div>
+            </div>
+        </footer>
+    </div> <!-- End Page Wrapper -->
+
+    <button id="backToTop" class="back-to-top" title="Back to Top">
+        <i class="fas fa-arrow-up" aria-hidden="true"></i><span class="sr-only">Back to Top</span>
+    </button>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/toolbar/prism-toolbar.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/copy-to-clipboard/prism-copy-to-clipboard.min.js"></script>
+
+    <!-- Quiz JavaScript -->
+    <script>
+        // --- Standard Theme/Scroll JS ---
+        (function() { // IIFE
+             const htmlElement = document.documentElement;
+             const themeToggle = document.getElementById('themeToggle');
+             const backToTopButton = document.getElementById('backToTop');
+             const prismDarkThemeLink = document.getElementById('prism-dark-theme');
+             const prismLightThemeLink = document.getElementById('prism-light-theme');
+             const themeIcon = themeToggle?.querySelector('i');
+
+             const applyTheme = (theme) => {
+                 htmlElement.setAttribute('data-theme', theme);
+                 htmlElement.classList.toggle('light-mode', theme === 'light');
+                 if (themeIcon) {
+                     themeIcon.className = `fas ${theme === 'dark' ? 'fa-moon' : 'fa-sun'}`;
+                     themeToggle.title = theme === 'dark' ? "Activate Light Mode" : "Activate Dark Mode";
+                 }
+                 if (prismDarkThemeLink) prismDarkThemeLink.disabled = (theme !== 'dark');
+                 if (prismLightThemeLink) prismLightThemeLink.disabled = (theme === 'dark');
+                 if (typeof Prism !== 'undefined') setTimeout(() => Prism.highlightAll(), 0);
+             };
+             const toggleTheme = () => { const newTheme = (htmlElement.getAttribute('data-theme') || 'dark') === 'dark' ? 'light' : 'dark'; localStorage.setItem('theme', newTheme); applyTheme(newTheme); };
+             const checkSystemPreference = () => localStorage.getItem('theme') || 'dark'; // Default dark
+             const handleScroll = () => { if (backToTopButton) backToTopButton.classList.toggle('show', window.pageYOffset > 300); };
+
+             themeToggle?.addEventListener('click', toggleTheme);
+             backToTopButton?.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+             window.addEventListener('scroll', handleScroll, { passive: true });
+
+             document.addEventListener('DOMContentLoaded', () => { applyTheme(checkSystemPreference()); if (typeof Prism !== 'undefined') Prism.highlightAll(); handleScroll(); initQuiz(); }); // Initialize Quiz here
+         })();
+
+        // --- Quiz Logic ---
+        const quizData = [
+            {
+                question: "What is the primary goal of steganography?",
+                options: [
+                    "To encrypt data so it's unreadable",
+                    "To hide the existence of communication",
+                    "To compress data for faster transmission",
+                    "To verify the integrity of data"
+                ],
+                correctAnswer: 1 // Index of the correct option
+            },
+            {
+                question: "Which image file format is generally UNSUITABLE for LSB steganography?",
+                options: ["PNG", "BMP", "JPEG", "TIFF"],
+                correctAnswer: 2
+            },
+            {
+                question: "What does LSB stand for in the context of steganography?",
+                options: ["Large Scale Buffer", "Least Significant Bit", "Linear System Byte", "Lossless Standard Bitmap"],
+                correctAnswer: 1
+            },
+            {
+                question: "Which metric measures the visual similarity between the original and stego image based on structure, luminance, and contrast?",
+                options: ["PSNR (Peak Signal-to-Noise Ratio)", "BER (Bit Error Rate)", "SSIM (Structural Similarity Index)", "BPP (Bits Per Pixel)"],
+                correctAnswer: 2
+            },
+            {
+                question: "What is the main trade-off when increasing the payload (amount of hidden data) in steganography?",
+                options: [
+                    "Increased robustness, lower capacity",
+                    "Decreased imperceptibility and robustness",
+                    "Increased encryption strength",
+                    "Faster embedding time"
+                ],
+                correctAnswer: 1
+            },
+            {
+                question: "What is steganalysis primarily concerned with?",
+                options: [
+                    "Decrypting hidden messages",
+                    "Detecting the presence of hidden messages",
+                    "Embedding messages more efficiently",
+                    "Improving the PSNR of stego images"
+                ],
+                correctAnswer: 1
+            },
+             {
+                question: "Why is using AES encryption along with steganography recommended?",
+                options: [
+                    "It makes the hidden data smaller",
+                    "It increases the embedding capacity",
+                    "It provides confidentiality even if the hidden data is detected",
+                    "It makes the stego image look identical to the original"
+                ],
+                correctAnswer: 2
+            },
+             {
+                question: "Which steganography domain is generally more robust against compression like JPEG?",
+                options: [
+                    "Spatial Domain (e.g., LSB)",
+                    "Frequency Domain (e.g., DCT, DWT)",
+                    "Time Domain",
+                    "Palette Domain"
+                ],
+                correctAnswer: 1
+            }
+            // Add more questions here...
+        ];
+
+        const quizContainer = document.getElementById('quiz-container');
+        const quizActiveDiv = document.getElementById('quiz-active');
+        const questionNumberEl = document.getElementById('question-number');
+        const questionTextEl = document.getElementById('question-text');
+        const answerOptionsEl = document.getElementById('answer-options');
+        const feedbackEl = document.getElementById('feedback');
+        const nextButton = document.getElementById('next-button');
+        const quizResultsDiv = document.getElementById('quiz-results');
+        const scoreEl = document.getElementById('score');
+        const scorePercentageEl = document.getElementById('score-percentage');
+        const restartButton = document.getElementById('restart-button');
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let answerSelected = false;
+
+        function loadQuestion() {
+            answerSelected = false; // Reset flag for new question
+            feedbackEl.style.display = 'none'; // Hide feedback
+            feedbackEl.className = ''; // Clear feedback classes
+            nextButton.disabled = true; // Disable until an answer is selected
+            nextButton.textContent = 'Select an answer';
+
+            if (currentQuestionIndex < quizData.length) {
+                const currentQuestion = quizData[currentQuestionIndex];
+                questionNumberEl.textContent = `Question ${currentQuestionIndex + 1} / ${quizData.length}`;
+                questionTextEl.textContent = currentQuestion.question;
+
+                answerOptionsEl.innerHTML = ''; // Clear previous options
+                currentQuestion.options.forEach((option, index) => {
+                    const optionDiv = document.createElement('div');
+                    optionDiv.className = 'answer-option';
+                    optionDiv.dataset.index = index;
+
+                    const radioInput = document.createElement('input');
+                    radioInput.type = 'radio';
+                    radioInput.name = 'answer';
+                    radioInput.value = index;
+                    radioInput.id = `option${index}`;
+
+                    const label = document.createElement('label');
+                    label.htmlFor = `option${index}`;
+                    label.textContent = option;
+
+                    optionDiv.appendChild(radioInput);
+                    optionDiv.appendChild(label);
+
+                    // Add event listener to the DIV for easier clicking
+                     optionDiv.addEventListener('click', () => {
+                         if (!answerSelected) { // Only allow selection once per question
+                             radioInput.checked = true;
+                             handleAnswerSelection(optionDiv, index);
+                         }
+                     });
+                     // Also handle direct radio button clicks
+                     radioInput.addEventListener('change', () => {
+                          if (!answerSelected) {
+                             handleAnswerSelection(optionDiv, index);
+                          }
+                     });
+
+                    answerOptionsEl.appendChild(optionDiv);
+                });
+
+                // Set button text for the last question
+                if (currentQuestionIndex === quizData.length - 1) {
+                    // The text will change to "Show Results" after selection
+                } else {
+                    // Text is handled in handleAnswerSelection
+                }
+            } else {
+                showResults();
+            }
+        }
+
+        function handleAnswerSelection(selectedOptionDiv, selectedIndex) {
+            if (answerSelected) return; // Prevent multiple selections/feedback loops
+            answerSelected = true;
+
+            const correctAnswerIndex = quizData[currentQuestionIndex].correctAnswer;
+            const options = answerOptionsEl.querySelectorAll('.answer-option');
+
+            // Disable all options after selection
+            options.forEach(opt => opt.classList.add('disabled'));
+
+            // Highlight selected option
+            selectedOptionDiv.classList.add('selected');
+
+            // Provide feedback
+            feedbackEl.style.display = 'block';
+            if (selectedIndex === correctAnswerIndex) {
+                score++;
+                selectedOptionDiv.classList.add('correct');
+                feedbackEl.textContent = 'Correct!';
+                feedbackEl.className = 'correct';
+            } else {
+                selectedOptionDiv.classList.add('incorrect');
+                 // Highlight the correct answer as well
+                 options[correctAnswerIndex]?.classList.add('correct'); // Use optional chaining
+                feedbackEl.textContent = `Incorrect. The correct answer was: ${quizData[currentQuestionIndex].options[correctAnswerIndex]}`;
+                feedbackEl.className = 'incorrect';
+            }
+
+            // Enable and update Next button
+            nextButton.disabled = false;
+            if (currentQuestionIndex < quizData.length - 1) {
+                nextButton.innerHTML = 'Next Question <i class="fas fa-arrow-right"></i>';
+            } else {
+                nextButton.textContent = 'Show Results';
+            }
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            loadQuestion();
+        }
+
+        function showResults() {
+            quizActiveDiv.style.display = 'none';
+            quizResultsDiv.style.display = 'block';
+            const percentage = ((score / quizData.length) * 100).toFixed(1);
+            scoreEl.textContent = `Your Score: ${score} / ${quizData.length}`;
+            scorePercentageEl.textContent = `(${percentage}%)`;
+
+             // Add encouraging message based on score
+             let resultMessage = '';
+             if (percentage >= 80) resultMessage = "Excellent work!";
+             else if (percentage >= 60) resultMessage = "Good job! You know your stuff.";
+             else if (percentage >= 40) resultMessage = "Not bad, maybe review the docs a bit more.";
+             else resultMessage = "Keep learning! Check the resources and documentation.";
+             // Add the message after the percentage
+             const messageEl = document.createElement('p');
+             messageEl.textContent = resultMessage;
+             messageEl.style.marginTop = '1rem';
+             messageEl.style.color = 'var(--medium-text)';
+             scorePercentageEl.parentNode.insertBefore(messageEl, scorePercentageEl.nextSibling);
+
+        }
+
+        function restartQuiz() {
+            currentQuestionIndex = 0;
+            score = 0;
+            answerSelected = false;
+            quizResultsDiv.style.display = 'none';
+            quizActiveDiv.style.display = 'block';
+             // Remove any dynamically added result messages
+             const dynamicMsg = quizResultsDiv.querySelector('p:not([id])');
+             if (dynamicMsg) dynamicMsg.remove();
+            loadQuestion();
+        }
+
+        function initQuiz() {
+            nextButton.addEventListener('click', () => {
+                if (currentQuestionIndex < quizData.length - 1) {
+                    nextQuestion();
+                } else {
+                    showResults();
+                }
+            });
+            restartButton.addEventListener('click', restartQuiz);
+            loadQuestion(); // Load the first question
+        }
+
+    </script>
+
+</body>
+</html>

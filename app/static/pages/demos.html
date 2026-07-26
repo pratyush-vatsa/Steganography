@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interactive Demos - Secure Steganography (JS)</title>
+  <!-- Libraries (Font Awesome Only) -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <!-- Removed React/Babel Dependencies -->
+
+  <!-- Prism.js for potential future code snippets -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css" rel="stylesheet" id="prism-dark-theme" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" rel="stylesheet" id="prism-light-theme" disabled />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/toolbar/prism-toolbar.min.css" rel="stylesheet" />
+
+  <!-- Link to the SAME CSS file or copy the <style> block from Explanation.html -->
+   <style>
+        /* --- Base & Variables --- */
+        :root {
+            --primary: #4f46e5;
+            --primary-light: #818cf8;
+            --primary-dark: #3730a3;
+            --secondary: #06b6d4;
+            --accent: #f472b6;
+            --dark: #1e293b; /* Dark text / Light BG element */
+            --light: #f8fafc; /* Light text / Dark BG element */
+            --bg-light: #f8fafc;
+            --bg-dark: #0f172a;
+            --card-bg-light: rgba(255, 255, 255, 0.95);
+            --card-bg-dark: rgba(30, 41, 59, 0.9); /* Slightly less transparent */
+            --card-border-light: rgba(79, 70, 229, 0.1);
+            --card-border-dark: rgba(129, 140, 248, 0.15);
+            --code-bg-light: #f8f8f2; /* Light theme code background */
+            --code-bg-dark: #282a36; /* Dark theme code background (Okaidia-like) */
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --container-shadow: var(--shadow-xl);
+            --gradient: linear-gradient(135deg, var(--primary), var(--secondary));
+            --text-light: #64748b; /* Lighter text for secondary info */
+            --text-dark: var(--dark);
+            --warning: #f97316; /* Orange for warnings */
+            --error: #ef4444; /* Red for errors/low robustness */
+            --success: #22c55e; /* Green for success/good */
+
+            /* Tag Colors (Light Mode) */
+            --tag-bg-default: rgba(79, 70, 229, 0.1);
+            --tag-text-default: var(--primary);
+            --tag-bg-security: hsla(0, 84%, 60%, 0.1);    /* Reddish */
+            --tag-text-security: hsl(0, 74%, 50%);
+            --tag-bg-advanced: hsla(270, 80%, 65%, 0.1);  /* Purplish */
+            --tag-text-advanced: hsl(270, 70%, 55%);
+            --tag-bg-encryption: hsla(217, 91%, 60%, 0.1); /* Blueish */
+            --tag-text-encryption: hsl(217, 81%, 50%);
+            --tag-bg-quality: hsla(145, 63%, 49%, 0.1);  /* Greenish */
+            --tag-text-quality: hsl(145, 58%, 39%);
+            --tag-bg-convenience: hsla(48, 96%, 59%, 0.1);/* Yellowish */
+            --tag-text-convenience: hsl(48, 90%, 45%);
+            --tag-bg-analysis: hsla(210, 40%, 50%, 0.1);  /* Grey-Blue */
+            --tag-text-analysis: hsl(210, 30%, 40%);
+
+
+            /* Default to light mode */
+            --bg-main: var(--bg-light);
+            --text-main: var(--text-dark);
+            --text-muted: var(--text-light);
+            --card-bg: var(--card-bg-light);
+            --card-border: var(--card-border-light);
+            --code-bg: var(--code-bg-light);
+
+            /* Heading Colors */
+            --h2-color-process: #4f46e5; /* Indigo for process-related headings */
+            --h2-color-metrics: #06b6d4; /* Cyan for metrics-related headings */
+            --h2-color-security: #ef4444; /* Red for security-related headings */
+            --h2-color-technical: #f97316; /* Orange for technical headings */
+            --h3-color-light: #64748b; /* Slate for light mode h3 */
+            --h3-color-dark: #94a3b8; /* Slate for dark mode h3 */
+        }
+
+        /* --- Dark Mode Overrides --- */
+        html[data-theme="dark"] {
+            --primary: #818cf8;
+            --primary-light: #a5b4fc;
+            --primary-dark: #6366f1;
+            --secondary: #22d3ee;
+            --accent: #f9a8d4;
+            --dark: #f8fafc; /* Dark text becomes light */
+            --light: #0f172a; /* Light text becomes dark */
+            --bg-main: var(--bg-dark);
+            --text-main: var(--dark); /* Use light text on dark bg */
+            --text-muted: #94a3b8; /* Adjusted muted text for dark */
+            --card-bg: var(--card-bg-dark);
+            --card-border: var(--card-border-dark);
+            --code-bg: var(--code-bg-dark);
+            --container-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.3);
+            --warning: #fb923c; /* Lighter orange */
+            --error: #f87171; /* Lighter red */
+            --success: #4ade80; /* Lighter green */
+
+             /* Tag Colors (Dark Mode) */
+            --tag-bg-default: rgba(129, 140, 248, 0.15);
+            --tag-text-default: var(--primary);
+            --tag-bg-security: hsla(0, 84%, 70%, 0.15);
+            --tag-text-security: hsl(0, 74%, 70%);
+            --tag-bg-advanced: hsla(270, 80%, 75%, 0.15);
+            --tag-text-advanced: hsl(270, 70%, 75%);
+            --tag-bg-encryption: hsla(217, 91%, 70%, 0.15);
+            --tag-text-encryption: hsl(217, 81%, 70%);
+            --tag-bg-quality: hsla(145, 63%, 59%, 0.15);
+            --tag-text-quality: hsl(145, 58%, 69%);
+            --tag-bg-convenience: hsla(48, 96%, 69%, 0.15);
+            --tag-text-convenience: hsl(48, 90%, 65%);
+             --tag-bg-analysis: hsla(210, 40%, 70%, 0.15);
+            --tag-text-analysis: hsl(210, 30%, 70%);
+        }
+
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth; /* Smooth scrolling for anchor links */
+            scroll-padding-top: 100px; /* Adjust for sticky header/nav height */
+        }
+
+
+        body {
+          font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+          background-color: var(--bg-main);
+          color: var(--text-main);
+          font-size: 18px; /* Base font size */
+          line-height: 1.7; /* Increased line height for readability */
+          transition: background-color 0.4s ease, color 0.4s ease;
+          overflow-x: hidden; /* Prevent horizontal scroll */
+        }
+        /* Prevent body scroll when mobile ToC is open */
+        body.toc-open-mobile {
+           overflow: hidden;
+        }
+
+         /* Reduced motion preference */
+        @media (prefers-reduced-motion: reduce) {
+          html {
+            scroll-behavior: auto; /* Disable smooth scrolling */
+          }
+          *, *::before, *::after {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+            scroll-behavior: auto !important;
+          }
+          .logo-icon { animation: none; }
+          .section { transition: none; opacity: 1; transform: none; }
+        }
+
+        /* --- Layout & Container --- */
+        .page-wrapper {
+            display: flex;
+            flex-direction: column; /* Stack header, content */
+            min-height: 100vh;
+        }
+
+        .content-wrapper {
+            /* display: flex; */ /* No sidebar needed on this page */
+            flex: 1; /* Allow content to grow */
+        }
+
+        .main-content {
+            flex: 1; /* Take remaining space */
+            padding: 0 2rem; /* Padding around the main content area */
+            max-width: 1200px; /* Max width for content readability */
+            margin: 0 auto; /* Center the content block */
+        }
+
+        .container {
+           width: 100%;
+           margin: 0 auto; /* Center container */
+        }
+
+        /* --- Background Pattern --- */
+        .bg-pattern {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          z-index: -1;
+          opacity: 0.05; /* Further reduced opacity */
+          pointer-events: none;
+          background-image: radial-gradient(var(--primary) 0.5px, transparent 0.5px);
+          background-size: 25px 25px; /* Slightly larger pattern */
+          transition: opacity 0.4s ease;
+        }
+         html[data-theme="dark"] .bg-pattern {
+             opacity: 0.07;
+             background-image: radial-gradient(var(--primary-light) 0.5px, transparent 0.5px);
+         }
+
+        /* --- Header --- */
+        header {
+          padding: 1.5rem 2rem; /* Consistent padding */
+          border-bottom: 1px solid var(--card-border);
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          position: sticky; /* Make header sticky */
+          top: 0;
+          background-color: var(--card-bg); /* Use card bg for backdrop */
+          backdrop-filter: blur(12px);
+          z-index: 50; /* Ensure header is above content but below modals/ToC toggle */
+          transition: background-color 0.4s ease, border-color 0.4s ease;
+        }
+
+        .logo {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+        }
+
+        .logo h1 {
+          font-size: 1.8rem; /* Adjusted size */
+          font-weight: 700;
+          background: var(--gradient);
+          -webkit-background-clip: text;
+          background-clip: text;
+          color: transparent;
+        }
+
+        .logo-icon {
+          font-size: 2rem; /* Adjusted size */
+          color: var(--primary);
+          animation: pulse 2.5s infinite ease-in-out;
+        }
+
+        .header-buttons {
+            display: flex;
+            gap: 0.8rem; /* Adjust gap */
+            align-items: center;
+        }
+
+        /* Search Input in Header - HIDE ON THIS PAGE */
+        .search-container {
+            display: none;
+        }
+
+        /* Dropdown Menu Styles */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .dropdown-button {
+            background: transparent;
+            border: 1px solid var(--card-border);
+            color: var(--text-muted);
+            padding: 0.6rem 1.1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            display: inline-flex; /* Changed from flex */
+            align-items: center;
+            gap: 0.6rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+        .dropdown-button:hover {
+            color: var(--accent); /* Use accent color for demos */
+            border-color: var(--accent);
+            background-color: rgba(244, 114, 182, 0.05); /* Pinkish accent hint */
+        }
+        .dropdown-button i.fa-chevron-down {
+            font-size: 0.8em;
+            margin-left: 0.3em;
+            transition: transform 0.3s ease;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: var(--card-bg);
+            min-width: 220px;
+            box-shadow: var(--shadow-lg);
+            border-radius: 8px;
+            border: 1px solid var(--card-border);
+            z-index: 60; /* Above header content */
+            right: 0; /* Align to the right */
+            top: calc(100% + 10px); /* Position below button */
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            padding: 0.5rem 0;
+        }
+        /* Show dropdown on hover/focus */
+        .dropdown:hover .dropdown-content,
+        .dropdown-button:focus + .dropdown-content,
+        .dropdown-content:hover {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .dropdown:hover .dropdown-button i.fa-chevron-down {
+             transform: rotate(180deg);
+        }
+        .dropdown-content a {
+            color: var(--text-main);
+            padding: 0.8rem 1.5rem;
+            text-decoration: none;
+            display: block;
+            font-size: 0.95rem;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+        .dropdown-content a:hover {
+            background-color: rgba(79, 70, 229, 0.05);
+            color: var(--primary);
+        }
+        html[data-theme="dark"] .dropdown-content a:hover {
+             background-color: rgba(129, 140, 248, 0.1);
+        }
+        .dropdown-content a i {
+            margin-right: 0.8rem;
+            color: var(--accent);
+            width: 1.2em;
+            text-align: center;
+        }
+
+
+        /* Theme Toggle Button */
+        .theme-toggle {
+          background: transparent;
+          border: 1px solid var(--card-border);
+          color: var(--text-muted);
+          padding: 0.6rem 1.1rem;
+          border-radius: 50px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+          font-weight: 500;
+          transition: all 0.3s ease;
+          font-size: 0.9rem;
+        }
+        .theme-toggle:hover {
+          color: var(--primary);
+          border-color: var(--primary);
+          background-color: rgba(79, 70, 229, 0.05);
+        }
+        .theme-toggle i { width: 1em; text-align: center; }
+
+        /* Return Button (Change link) */
+        .return-button {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.6rem;
+          background: transparent;
+          border: 1px solid var(--card-border);
+          color: var(--text-muted);
+          padding: 0.6rem 1.1rem;
+          border-radius: 50px;
+          text-decoration: none;
+          font-weight: 500;
+          transition: all 0.3s ease;
+          font-size: 0.9rem;
+        }
+        .return-button:hover {
+          color: var(--secondary);
+          border-color: var(--secondary);
+          background-color: rgba(6, 182, 212, 0.05);
+        }
+        .return-button i { font-size: 0.9em; }
+
+        /* Mobile ToC Toggle - HIDE ON THIS PAGE */
+        .toc-toggle-mobile { display: none; }
+
+        /* --- Hero Section (Simplified) --- */
+        #hero {
+            padding: 4rem 2rem 3rem 2rem; /* Reduced padding */
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            background: var(--gradient);
+            color: white;
+            margin-bottom: 3rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        #hero::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.3));
+            z-index: 1;
+        }
+         #hero-content { position: relative; z-index: 2; max-width: 800px; margin: 0 auto; }
+        #hero h1 {
+            font-size: 2.8rem; /* Slightly smaller */
+            font-weight: 800; margin-bottom: 1rem; color: white;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+            background: none; -webkit-background-clip: initial; background-clip: initial;
+        }
+        #hero .tagline {
+            font-size: 1.15rem; font-weight: 400; color: rgba(255, 255, 255, 0.9);
+            max-width: 600px; margin: 0 auto;
+        }
+
+        /* --- Sections (General) --- */
+        .section {
+          padding: 2.5rem;
+          margin: 2.5rem 0;
+          background: var(--card-bg);
+          border-radius: 1rem;
+          box-shadow: var(--shadow-md);
+          transition: all 0.4s ease;
+          border: 1px solid var(--card-border);
+        }
+        .section-header {
+          display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem;
+        }
+        .section-header h2 {
+            font-size: 2rem; font-weight: 700; color: var(--primary); margin: 0;
+        }
+        .section-header i {
+            font-size: 1.5rem; color: var(--primary);
+            background-color: rgba(79, 70, 229, 0.1);
+            width: 50px; height: 50px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        }
+        .section > p:first-of-type { /* General paragraph under section header */
+            font-size: 1.1rem; color: var(--text-muted); margin-bottom: 1.5rem;
+        }
+
+        /* --- Interactive Demo Wrapper --- */
+        .interactive-demo {
+          /* Reusing styles from Explanation.html - padding applied within demo components */
+        }
+         /* Global styles for demo headings/descriptions */
+         .interactive-demo h3 {
+             font-size: 1.8rem; font-weight: 600; margin-bottom: 1.8rem;
+             color: var(--primary); text-align: center;
+        }
+         .demo-description {
+             text-align: center; margin-bottom: 2rem; color: var(--text-muted);
+             font-size: 1.05rem; max-width: 700px; margin-left: auto; margin-right: auto;
+        }
+         /* Global styles for demo buttons */
+        .demo-button {
+            padding: 0.9rem 1.8rem; font-size: 1rem; border-radius: 50px;
+            border: 1px solid var(--primary); background-color: var(--primary);
+            color: white; cursor: pointer; transition: all 0.3s ease;
+            font-weight: 500; display: inline-flex; align-items: center; gap: 0.5em;
+            line-height: 1; /* Prevent button height change due to text wrap */
+        }
+        .demo-button.reset { background-color: transparent; color: var(--primary); }
+        .demo-button:disabled { opacity: 0.5; cursor: not-allowed; background-color: var(--text-muted); border-color: var(--text-muted); }
+        html[data-theme="dark"] .demo-button:disabled { background-color: #555; border-color: #555; }
+
+        .demo-button:not(:disabled):hover {
+            background-color: var(--primary-dark); transform: translateY(-2px); box-shadow: var(--shadow-md);
+        }
+        .demo-button.reset:not(:disabled):hover {
+            background-color: rgba(79, 70, 229, 0.1); transform: translateY(-2px); box-shadow: var(--shadow-sm); color: var(--primary-dark);
+        }
+        html[data-theme="dark"] .demo-button:not(:disabled):hover { background-color: var(--primary-light); }
+        html[data-theme="dark"] .demo-button.reset:not(:disabled):hover { background-color: rgba(129, 140, 248, 0.15); color: var(--primary-light); }
+
+        .demo-controls { display: flex; justify-content: center; gap: 1rem; margin-top: 2.5rem; flex-wrap: wrap; }
+
+        /* --- Footer --- */
+        footer {
+            margin-top: 6rem; text-align: center; padding: 3rem 2rem;
+            color: var(--text-muted); opacity: 0.9; font-size: 0.95rem;
+            border-top: 1px solid var(--card-border);
+            background-color: var(--card-bg);
+            transition: background-color 0.4s ease, border-color 0.4s ease;
+        }
+         .footer-content { max-width: 800px; margin: 0 auto; }
+         .footer-links { display: flex; justify-content: center; gap: 2rem; margin-top: 1rem; flex-wrap: wrap; }
+         .footer-links a { color: var(--text-muted); text-decoration: none; transition: color 0.3s ease; }
+         .footer-links a:hover { color: var(--primary); }
+         .footer-links a i { margin-right: 0.5em; }
+
+        /* --- Back to Top Button --- */
+        .back-to-top {
+          position: fixed; bottom: 30px; right: 30px; width: 50px; height: 50px;
+          border-radius: 50%; background: var(--primary); color: white;
+          display: flex; justify-content: center; align-items: center;
+          cursor: pointer; transition: all 0.4s ease;
+          transform: translateY(100px) scale(0.8); opacity: 0;
+          border: none; box-shadow: var(--shadow-lg); z-index: 100; font-size: 1.2rem;
+        }
+        .back-to-top.show { transform: translateY(0) scale(1); opacity: 1; }
+        .back-to-top:hover { background: var(--primary-light); transform: translateY(-5px) scale(1.05); }
+
+        /* === COMPONENT-SPECIFIC STYLES === */
+
+         /* --- LSB Demo Styles --- */
+         .lsb-demo-container { padding: 1rem 0; } /* Add padding if needed */
+         .lsb-demo-content { display: flex; gap: 2rem; flex-wrap: wrap; justify-content: center; margin-bottom: 2rem; }
+         .lsb-demo-pixels-section { flex: 1; min-width: 300px; padding: 1.5rem; border-radius: 8px; background-color: rgba(0,0,0,0.02); border: 1px solid var(--card-border); transition: opacity 0.5s ease, transform 0.5s ease; }
+         html[data-theme="dark"] .lsb-demo-pixels-section { background-color: rgba(255,255,255,0.03); }
+         .lsb-demo-pixels-section h4 { font-size: 1.2rem; font-weight: 600; margin-bottom: 1rem; color: var(--text-main); }
+         .lsb-demo-channels { display: flex; flex-direction: column; gap: 1.5rem; }
+         .lsb-demo-channel-label { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem; font-weight: 500; }
+         .lsb-demo-channel-value { margin-left: 5px; } /* Added for JS update */
+         .lsb-demo-channel-original-value { margin-left: 10px; font-size: 0.9em; color: var(--text-muted); } /* Added */
+         .lsb-demo-color-box { width: 20px; height: 20px; border-radius: 4px; border: 1px solid rgba(0,0,0,0.1); flex-shrink: 0; }
+         .lsb-demo-bits { display: flex; gap: 4px; flex-wrap: wrap; align-items: center; }
+         .lsb-demo-bit { width: 30px; height: 30px; display: flex; justify-content: center; align-items: center; border: 1px solid var(--card-border); border-radius: 4px; font-family: monospace; font-size: 0.95rem; background-color: var(--bg-main); transition: all 0.3s ease; color: var(--text-main); position: relative; }
+         html[data-theme="dark"] .lsb-demo-bit { border-color: #555; }
+         .lsb-demo-bit.lsb { /* border-width: 1px; /* Base style is fine */ }
+         .lsb-demo-bit.lsb-target { /* LSB to be replaced */
+            border: 2px solid var(--error);
+            background-color: hsla(0, 100%, 90%, 0.3);
+            transform: scale(1.05);
+            z-index: 1;
+         }
+         html[data-theme="dark"] .lsb-demo-bit.lsb-target { background-color: hsla(0, 100%, 70%, 0.1); }
+
+         .lsb-demo-bit.lsb-modified { /* LSB after replacement */
+            border: 2px solid var(--success);
+            background-color: hsla(120, 70%, 90%, 0.4);
+            color: var(--success);
+            font-weight: bold;
+            transform: scale(1.05);
+            z-index: 1;
+         }
+         html[data-theme="dark"] .lsb-demo-bit.lsb-modified { background-color: hsla(120, 70%, 50%, 0.1); }
+
+         .lsb-demo-lsb-label {
+             position: absolute; top: -1.8em; left: 50%; transform: translateX(-50%);
+             font-size: 0.8em; color: var(--text-muted);
+             font-style: italic; white-space: nowrap;
+             background: var(--card-bg); padding: 0.1em 0.4em; border-radius: 3px;
+             border: 1px solid var(--card-border);
+             opacity: 0; transition: opacity 0.4s ease;
+             pointer-events: none; /* Prevent interference */
+         }
+          .lsb-demo-bit.lsb-target .lsb-demo-lsb-label { opacity: 1; color: var(--error); }
+          .lsb-demo-bit.lsb-modified .lsb-demo-lsb-label { opacity: 1; color: var(--success); }
+
+         .lsb-demo-controls-explanation { display: flex; gap: 2rem; margin-top: 2rem; flex-wrap: wrap; align-items: stretch; /* Make boxes same height */ }
+         .lsb-demo-secret-data { flex-basis: 30%; min-width: 200px; padding: 1rem 1.5rem; border: 1px solid var(--card-border); border-radius: 8px; text-align: center; background: rgba(79, 70, 229, 0.03); display: flex; flex-direction: column; justify-content: center; }
+         html[data-theme="dark"] .lsb-demo-secret-data { background: rgba(129, 140, 248, 0.05); }
+         .lsb-demo-secret-data h4 { font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; }
+         .lsb-demo-secret-bits { display: flex; gap: 0.5rem; margin-top: 0.5rem; justify-content: center; }
+         .lsb-demo-secret-bits .lsb-demo-bit { /* border-width: 1px; */ } /* Base style */
+         .lsb-demo-secret-bits .lsb-demo-bit.secret-highlight { /* Secret bit to be used */
+             border: 2px solid var(--accent);
+             background-color: hsla(330, 80%, 90%, 0.4);
+             transform: scale(1.05);
+             z-index: 1;
+         }
+         html[data-theme="dark"] .lsb-demo-secret-bits .lsb-demo-bit.secret-highlight { background-color: hsla(330, 80%, 70%, 0.1); }
+
+         .lsb-demo-explanation-box { flex: 1; background-color: rgba(0,0,0,0.02); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--card-border); font-size: 1rem; min-height: 120px; } /* Ensure minimum height */
+         html[data-theme="dark"] .lsb-demo-explanation-box { background-color: rgba(255,255,255,0.03); }
+         .lsb-demo-explanation-box h4 { font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; }
+         .lsb-demo-explanation-box p { color: var(--text-muted); line-height: 1.6; }
+
+        
+
+         /* --- Adaptive Channel Visualization Styles --- */
+        .adaptive-channel-container { padding: 1rem 0; } /* Renamed container for clarity */
+        .adaptive-channel-container .adaptive-content { display: flex; gap: 3rem; margin-top: 2rem; align-items: stretch; flex-wrap: wrap; }
+        .adaptive-channel-container .intensity-section, .adaptive-channel-container .channels-section { flex: 1 1 350px; background: rgba(0,0,0,0.02); padding: 2rem; border-radius: 12px; transition: background-color 0.4s ease; border: 1px solid var(--card-border); }
+        html[data-theme="dark"] .adaptive-channel-container .intensity-section, html[data-theme="dark"] .adaptive-channel-container .channels-section { background: rgba(255,255,255,0.03); }
+        .adaptive-channel-container h4 { font-size: 1.3rem; margin-bottom: 1.5rem; color: var(--text-main); font-weight: 600; }
+        .adaptive-channel-container .intensity-slider { margin-bottom: 2rem; }
+        .adaptive-channel-container input[type="range"] { width: 100%; cursor: pointer; accent-color: var(--primary); height: 8px; background: var(--card-border); border-radius: 5px; appearance: none; -webkit-appearance: none;}
+        .adaptive-channel-container input[type="range"]::-webkit-slider-thumb { appearance: none; -webkit-appearance: none; width: 20px; height: 20px; background: var(--primary); border-radius: 50%; cursor: pointer; border: 3px solid var(--bg-main); box-shadow: var(--shadow-sm); }
+        .adaptive-channel-container input[type="range"]::-moz-range-thumb { width: 20px; height: 20px; background: var(--primary); border-radius: 50%; cursor: pointer; border: 3px solid var(--bg-main); box-shadow: var(--shadow-sm); }
+        .adaptive-channel-container .range-labels { display: flex; justify-content: space-between; font-size: 0.9em; color: var(--text-muted); margin-top: 0.5rem; }
+        .adaptive-channel-container .intensity-display { width: 100%; height: 120px; border-radius: 8px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; transition: background-color 0.3s ease; border: 1px solid var(--card-border); position: relative; overflow: hidden; }
+        .adaptive-channel-container .intensity-value { font-size: 2rem; font-weight: bold; transition: color 0.3s ease; }
+        .adaptive-channel-container .intensity-label { position: absolute; bottom: 0; left: 0; right: 0; background-color: rgba(0, 0, 0, 0.5); color: white !important; padding: 0.4rem 0; font-size: 0.9rem; font-weight: 500; transition: background-color 0.3s ease; }
+        .adaptive-channel-container .channels-section p.description { margin-bottom: 1.5rem; font-size: 1rem; color: var(--text-muted); }
+        .adaptive-channel-container .channel-list { display: flex; flex-direction: column; gap: 1rem; }
+        .adaptive-channel-container .channel-item { display: flex; align-items: center; gap: 1rem; padding: 1rem; border-radius: 8px; background-color: var(--bg-main); transition: all 0.3s ease; border: 2px solid var(--card-border); opacity: 0.7; }
+        .adaptive-channel-container .channel-item.active { opacity: 1; border-color: var(--success); box-shadow: 0 0 0 2px hsla(145, 63%, 49%, 0.2); background-color: hsla(145, 63%, 49%, 0.05); }
+        html[data-theme="dark"] .adaptive-channel-container .channel-item.active { background-color: hsla(145, 63%, 59%, 0.07); box-shadow: 0 0 0 2px hsla(145, 63%, 59%, 0.25); border-color: var(--success); }
+        .adaptive-channel-container .channel-color { width: 25px; height: 25px; border-radius: 50%; flex-shrink: 0; border: 1px solid rgba(0,0,0,0.1); }
+        .adaptive-channel-container .channel-color.red { background-color: #ef4444; }
+        .adaptive-channel-container .channel-color.green { background-color: #22c55e; }
+        .adaptive-channel-container .channel-color.blue { background-color: #3b82f6; }
+        .adaptive-channel-container .channel-name { font-weight: 500; flex-grow: 1; } /* Allow name to take space */
+        .adaptive-channel-container .channel-status { /* Renamed class */ font-weight: bold; margin-left: 0.5em; font-size: 0.9em; }
+        .adaptive-channel-container .channel-status.active { color: var(--success); }
+        .adaptive-channel-container .channel-status.inactive { color: var(--text-muted); opacity: 0.7; }
+
+        .adaptive-channel-container .explanation-box { background-color: rgba(79, 70, 229, 0.03); padding: 2rem; border-radius: 12px; border: 1px dashed var(--card-border); font-size: 1rem; margin-top: 2.5rem; }
+        html[data-theme="dark"] .adaptive-channel-container .explanation-box { background-color: rgba(129, 140, 248, 0.05); }
+        .adaptive-channel-container .explanation-box h4 { margin-bottom: 1.5rem; font-size: 1.3rem; font-weight: 600; color: var(--primary); }
+        .adaptive-channel-container .explanation-items { display: flex; flex-direction: column; gap: 1.2rem; }
+        .adaptive-channel-container .explanation-item { display: flex; align-items: flex-start; gap: 1rem; }
+        .adaptive-channel-container .dot { width: 18px; height: 18px; border-radius: 50%; flex-shrink: 0; margin-top: 0.3em; border: 2px solid rgba(0,0,0,0.2)}
+        html[data-theme="dark"] .adaptive-channel-container .dot { border-color: rgba(255,255,255,0.3)}
+        .adaptive-channel-container .dot.dark { background-color: #333; }
+        .adaptive-channel-container .dot.medium { background-color: #888; }
+        .adaptive-channel-container .dot.bright { background-color: #ddd; }
+        .adaptive-channel-container .explanation-item p { margin: 0; color: var(--text-muted); line-height: 1.6;}
+        .adaptive-channel-container .explanation-item strong { color: var(--text-main); }
+        .adaptive-channel-container .explanation-box .footer-note { margin-top: 1.5rem; font-size: 0.9em; opacity: 0.8; color: var(--text-muted); font-style: italic; text-align: center; }
+
+         /* Responsive adjustments for demos */
+        @media (max-width: 900px) { /* Adjust breakpoint if needed */
+           .lsb-demo-controls-explanation { flex-direction: column; }
+           .comparison-container .metrics-display { gap: 1.5rem; }
+           .comparison-container .metric { min-width: 180px; }
+        }
+        @media (max-width: 768px) {
+           .lsb-demo-content { flex-direction: column; }
+           .adaptive-channel-container .adaptive-content { flex-direction: column; gap: 2rem; }
+           .comparison-container .upload-controls { flex-direction: column; align-items: center; }
+           .comparison-container .demo-upload-area { max-width: 80%; }
+           .footer-links { gap: 1rem; }
+           header { padding: 1rem; }
+           .logo h1 { font-size: 1.5rem;}
+           .logo-icon { font-size: 1.8rem; }
+           .header-buttons { gap: 0.5rem; }
+           .dropdown-button, .theme-toggle, .return-button { padding: 0.5rem 0.8rem; font-size: 0.85rem; }
+           #hero h1 { font-size: 2.2rem; }
+           #hero .tagline { font-size: 1.05rem; }
+           .section { padding: 1.5rem; margin: 1.5rem 0; }
+           .section-header h2 { font-size: 1.6rem; }
+           .section-header i { width: 40px; height: 40px; font-size: 1.2rem; }
+        }
+
+        /* Screen Reader only text */
+       .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0; }
+
+    </style>
+</head>
+<body>
+  <div class="bg-pattern"></div>
+
+  <div class="page-wrapper">
+    <!-- Header section (Same as Explanation.html, but change Return Button link) -->
+    <header>
+      <div class="logo">
+        <i class="fas fa-shield-alt logo-icon"></i>
+        <h1>Secure Steganography</h1>
+      </div>
+      <div class="header-buttons">
+        <!-- No Search Bar on this page -->
+
+        <div class="dropdown">
+            <button class="dropdown-button" aria-haspopup="true" aria-expanded="false">
+                <i class="fas fa-flask"></i>
+                <span>Demos</span>
+                <i class="fas fa-chevron-down" aria-hidden="true"></i>
+            </button>
+            <div class="dropdown-content" role="menu">
+                 <a href="#lsb" role="menuitem">
+                    <i class="fas fa-th" aria-hidden="true"></i> LSB Visualization
+                </a>
+                <a href="#adaptive" role="menuitem">
+                    <i class="fas fa-adjust" aria-hidden="true"></i> Adaptive Channel
+                </a>
+                 
+            </div>
+        </div>
+
+         <a href="/explanation" class="return-button" title="Return to Documentation">
+            <i class="fas fa-book" aria-hidden="true"></i>
+            <span class="sr-only">Return to Docs</span>
+         </a>
+        <button class="theme-toggle" id="themeToggle" title="Toggle Theme">
+          <i class="fas fa-moon" aria-hidden="true"></i>
+          <span class="sr-only">Toggle Theme</span>
+        </button>
+         <!-- No Mobile ToC Toggle -->
+      </div>
+    </header>
+
+    <!-- Hero Section (Simplified) -->
+     <section id="hero">
+        <div id="hero-content">
+            <h1>Interactive Demonstrations</h1>
+            <p class="tagline">Visualize key steganography concepts and compare image quality.</p>
+        </div>
+    </section>
+
+    <div class="content-wrapper">
+        <!-- Main Content Area -->
+        <main class="main-content">
+          <div class="container">
+
+            <!-- 1. LSB Demo Section -->
+            <section id="lsb" class="section">
+              <div class="section-header">
+                <i class="fas fa-th" aria-hidden="true"></i>
+                <h2>LSB Visualization</h2>
+              </div>
+              <p>See how Least Significant Bit (LSB) steganography replaces the final bit of pixel color channels to hide data.</p>
+              <div id="lsb-demo-container" class="interactive-demo lsb-demo-container">
+                  <!-- JS will populate this -->
+                   <h3>How LSB Steganography Works</h3>
+                    <p class="demo-description">
+                    This demo shows how the LSB technique embeds secret message bits ('101') into the least significant bits of a single pixel's RGB values.
+                    </p>
+
+                    <div class="lsb-demo-content">
+                    <!-- Pixel Values Section -->
+                    <div class="lsb-demo-pixels-section">
+                        <h4 id="lsb-pixel-title">Original Pixel Values</h4>
+                        <div class="lsb-demo-channels" id="lsb-channels-container">
+                        <!-- Channels will be generated by JS -->
+                        </div>
+                    </div>
+                    </div>
+
+                    <!-- Controls and Explanation -->
+                    <div class="lsb-demo-controls-explanation">
+                    <div class="lsb-demo-secret-data">
+                        <h4>Secret Bits to Hide</h4>
+                        <div class="lsb-demo-secret-bits" id="lsb-secret-bits-container">
+                        <!-- Secret bits will be generated by JS -->
+                        </div>
+                    </div>
+
+                    <div class="lsb-demo-explanation-box">
+                        <h4 id="lsb-explanation-title">Explanation (Step 1/3)</h4>
+                        <p id="lsb-explanation-text">Initial explanation text.</p>
+                    </div>
+                    </div>
+
+                    <div class="demo-controls">
+                    <button id="lsb-reset-button" class="demo-button reset">
+                        <i class="fas fa-undo" aria-hidden="true"></i> Reset
+                    </button>
+                    <button id="lsb-next-button" class="demo-button">
+                        Next Step (2/3) <i class="fas fa-arrow-right" aria-hidden="true"></i>
+                    </button>
+                    </div>
+              </div>
+            </section>
+
+            <!-- 2. Adaptive Channel Demo Section -->
+            <section id="adaptive" class="section">
+              <div class="section-header">
+                <i class="fas fa-adjust" aria-hidden="true"></i>
+                <h2>Adaptive Channel Selection</h2>
+              </div>
+              <p>Explore how the "Enhanced LSB" method chooses specific color channels based on pixel brightness to improve visual stealth.</p>
+              <div id="adaptive-channel-container" class="interactive-demo adaptive-channel-container">
+                <!-- JS will manage this -->
+                 <h3>Adaptive Channel Selection (Enhanced LSB)</h3>
+                <p class="demo-description">
+                    Enhanced LSB selects *two* specific color channels (R, G, or B) to hide data in, based on the pixel's overall brightness (intensity). This aims for better visual stealth compared to simple LSB. Drag the slider to simulate different pixel intensities.
+                </p>
+
+                <div class="adaptive-content">
+                    
+                    <div class="intensity-section">
+                        <h4>Simulate Pixel Intensity</h4>
+                        <div class="intensity-slider">
+                            <label for="intensityRange" class="sr-only">Pixel Intensity</label>
+                            <input
+                                id="intensityRange"
+                                type="range" min="0" max="255" value="120"
+                                aria-valuetext="120 (Medium)"
+                            />
+                            <div class="range-labels">
+                                <span>Dark (0)</span>
+                                <span>Medium (128)</span>
+                                <span>Bright (255)</span>
+                            </div>
+                        </div>
+                        <div id="intensityDisplay" class="intensity-display" style="background-color: rgb(120, 120, 120);">
+                            <span id="intensityValue" class="intensity-value" style="color: rgb(238, 238, 238);">120</span>
+                            <div id="intensityLabel" class="intensity-label">Medium Pixel Area</div>
+                        </div>
+                    </div>
+
+                    
+                    <div class="channels-section">
+                        <h4>Selected Channels for Embedding</h4>
+                        <p class="description" id="adaptive-channel-description">
+                            For this medium pixel area (intensity: 120), Enhanced LSB embeds data using the LSBs of:
+                        </p>
+                        <div class="channel-list">
+                            <div id="channel-red" class="channel-item">
+                                <div class="channel-color red"></div>
+                                <span class="channel-name">Red Channel</span>
+                                <span class="channel-status inactive">(Skipped)</span>
+                            </div>
+                            <div id="channel-green" class="channel-item active">
+                                <div class="channel-color green"></div>
+                                <span class="channel-name">Green Channel</span>
+                                <span class="channel-status active">(USED)</span>
+                            </div>
+                            <div id="channel-blue" class="channel-item active">
+                                <div class="channel-color blue"></div>
+                                <span class="channel-name">Blue Channel</span>
+                                <span class="channel-status active">(USED)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+               
+                <div class="explanation-box">
+                    <h4>Rationale: Perceptual Hiding Strategy</h4>a
+                    <div class="explanation-items">
+                        <div class="explanation-item">
+                            <div class="dot dark" aria-hidden="true"></div>
+                            <p><strong>Dark Pixels (<85):</strong> Use <strong>R + G</strong>. Human vision is more sensitive to changes in the Blue channel in dark areas, so modifying it is avoided.</p>
+                        </div>
+                        <div class="explanation-item">
+                            <div class="dot medium" aria-hidden="true"></div>
+                            <p><strong>Medium Pixels (85-170):</strong> Use <strong>G + B</strong>. The Green channel carries significant brightness detail; modifying Red in mid-tones might be more noticeable.</p>
+                        </div>
+                        <div class="explanation-item">
+                            <div class="dot bright" aria-hidden="true"></div>
+                            <p><strong>Bright Pixels (>170):</strong> Use <strong>R + B</strong>. In very bright areas, the Green channel contributes heavily to luminance; changes here might be more perceptible than in R or B.</p>
+                        </div>
+                    </div>
+                    <p class="footer-note">
+                        This strategy attempts to leverage quirks of human visual perception to minimize the visibility of LSB changes compared to naively using all three channels (Simple LSB).
+                    </p>
+                </div>
+              </div>
+            </section>
+
+             
+
+          </div> <!-- End Inner container -->
+        </main> <!-- End Main Content -->
+
+    </div> <!-- End Content Wrapper -->
+
+    <!-- Footer (Same as Explanation.html) -->
+    <footer>
+      <div class="footer-content">
+        <p>Secure Message Steganography Demos © 2024</p>
+        <div class="footer-links">
+           <a href="/explanation"><i class="fas fa-book-open" aria-hidden="true"></i> Full Documentation</a>
+           <a href="#hero"><i class="fas fa-arrow-up" aria-hidden="true"></i> Back to Top</a>
+        </div>
+      </div>
+    </footer>
+  </div> <!-- End Page Wrapper -->
+
+  <!-- Back to top button -->
+  <button id="backToTop" class="back-to-top" title="Back to Top">
+    <i class="fas fa-arrow-up" aria-hidden="true"></i>
+    <span class="sr-only">Back to Top</span>
+  </button>
+
+  <!-- Prism JS (Optional, if needed on this page) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/toolbar/prism-toolbar.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/copy-to-clipboard/prism-copy-to-clipboard.min.js"></script>
+
+  <!-- Main JavaScript (Vanilla JS Implementation) -->
+  <script>
+    // --- Global Elements & Functions (Theme, BackToTop etc.) ---
+    (function() {
+        const htmlElement = document.documentElement;
+        const body = document.body;
+        const themeToggle = document.getElementById('themeToggle');
+        const backToTopButton = document.getElementById('backToTop');
+        const prismDarkThemeLink = document.getElementById('prism-dark-theme');
+        const prismLightThemeLink = document.getElementById('prism-light-theme');
+        const themeIcon = themeToggle?.querySelector('i');
+
+        const applyTheme = (theme) => {
+            htmlElement.setAttribute('data-theme', theme);
+            if (themeIcon) {
+                themeIcon.classList.toggle('fa-moon', theme === 'light');
+                themeIcon.classList.toggle('fa-sun', theme === 'dark');
+                themeToggle.title = theme === 'dark' ? "Activate Light Mode" : "Activate Dark Mode";
+            }
+            if (prismDarkThemeLink) prismDarkThemeLink.disabled = (theme !== 'dark');
+            if (prismLightThemeLink) prismLightThemeLink.disabled = (theme === 'dark');
+            if (typeof Prism !== 'undefined') {
+                setTimeout(() => Prism.highlightAll(), 0);
+            }
+        };
+
+        const toggleTheme = () => {
+            const currentTheme = htmlElement.getAttribute('data-theme') || 'light';
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            localStorage.setItem('theme', newTheme);
+            applyTheme(newTheme);
+        };
+
+        const checkSystemPreference = () => {
+            const savedTheme = localStorage.getItem('theme');
+            return savedTheme || 'light'; // Default light
+        };
+
+        const handleScroll = () => {
+            if (backToTopButton) {
+                backToTopButton.classList.toggle('show', window.pageYOffset > 300);
+            }
+        };
+
+        // --- Event Listeners ---
+        themeToggle?.addEventListener('click', toggleTheme);
+        backToTopButton?.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+        window.addEventListener('scroll', handleScroll, { passive: true });
+
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            applyTheme(checkSystemPreference());
+            if (typeof Prism !== 'undefined') Prism.highlightAll();
+            handleScroll();
+
+            // Initialize Demos
+            initLSBDemo();
+            initAdaptiveDemo();
+            initComparisonSlider();
+        });
+    })();
+
+    // --- LSB Steganography Demo ---
+    function initLSBDemo() {
+        const container = document.getElementById('lsb-demo-container');
+        if (!container) return;
+
+        const channelsContainer = document.getElementById('lsb-channels-container');
+        const secretBitsContainer = document.getElementById('lsb-secret-bits-container');
+        const pixelTitle = document.getElementById('lsb-pixel-title');
+        const explanationTitle = document.getElementById('lsb-explanation-title');
+        const explanationTextEl = document.getElementById('lsb-explanation-text');
+        const resetButton = document.getElementById('lsb-reset-button');
+        const nextButton = document.getElementById('lsb-next-button');
+
+        const initialPixelBits = [
+            ['1', '0', '1', '0', '1', '1', '1', '0'], // 174 Red
+            ['0', '1', '0', '1', '0', '0', '1', '1'], // 83  Green
+            ['1', '1', '0', '0', '1', '0', '1', '0']  // 202 Blue
+        ];
+        const secretBits = ['1', '0', '1'];
+        const channelColors = ['#ef4444', '#22c55e', '#3b82f6'];
+        const channelNames = ['Red', 'Green', 'Blue'];
+        const explanationTexts = [
+            "Initial 8-bit values for the Red, Green, and Blue channels of a pixel. Each value (0-255) determines the color intensity. Click 'Next Step' to see how LSB works.",
+            "The Least Significant Bit (LSB, highlighted red) is the rightmost bit. We'll replace these with our secret bits ('101', highlighted pink). Notice these LSBs hold the smallest value (1 vs 128 for the leftmost bit).",
+            "The LSBs are replaced with the secret bits '101' (now highlighted green). Observe the minimal change in decimal values (e.g., Red 174 → 175, Blue 202 → 203). This subtlety makes LSB hiding hard to detect visually."
+        ];
+
+        let currentStep = 0; // 0: Initial, 1: Highlight, 2: Modified
+        let currentPixelBits = JSON.parse(JSON.stringify(initialPixelBits)); // Deep copy
+
+        const binToDec = (binArray) => parseInt(binArray.join(''), 2);
+
+        const renderLSBState = () => {
+            // Determine bits to display
+            const displayPixelBits = (currentStep === 2)
+                ? getModifiedPixels(initialPixelBits, secretBits)
+                : initialPixelBits;
+
+            // Update Pixel Section Title
+            pixelTitle.textContent = currentStep < 2 ? "Original Pixel Values" : "Modified Pixel Values";
+
+            // Clear and Render Channels
+            channelsContainer.innerHTML = ''; // Clear previous
+            displayPixelBits.forEach((channel, i) => {
+                const channelDiv = document.createElement('div');
+                const originalValue = binToDec(initialPixelBits[i]);
+                const currentValue = binToDec(channel);
+
+                let valueHtml = `Value: ${currentValue}`;
+                if (currentStep === 2 && originalValue !== currentValue) {
+                    valueHtml += `<span class="lsb-demo-channel-original-value">(Original: ${originalValue})</span>`;
+                }
+
+                channelDiv.innerHTML = `
+                    <div class="lsb-demo-channel-label" style="color: ${channelColors[i]}">
+                        <div class="lsb-demo-color-box" style="background-color: ${channelColors[i]}"></div>
+                        <span>${channelNames[i]}</span>
+                        <span class="lsb-demo-channel-value">${valueHtml}</span>
+                    </div>
+                    <div class="lsb-demo-bits">
+                        ${channel.map((bit, j) => {
+                            const isLSB = j === 7;
+                            const useSecretBit = i < secretBits.length;
+                            const isTargetLSB = isLSB && useSecretBit && currentStep === 1;
+                            const isModifiedLSB = isLSB && useSecretBit && currentStep === 2;
+                            const bitClass = `lsb-demo-bit ${isLSB ? 'lsb' : ''} ${isTargetLSB ? 'lsb-target' : ''} ${isModifiedLSB ? 'lsb-modified' : ''}`;
+                            const title = `Bit ${7 - j}${isLSB ? ' (LSB)' : ''}`;
+                            let lsbLabel = '';
+                            if(isTargetLSB) lsbLabel = '<span class="lsb-demo-lsb-label">Target LSB</span>';
+                            if(isModifiedLSB) lsbLabel = '<span class="lsb-demo-lsb-label">Modified</span>';
+
+                            return `<div class="${bitClass}" title="${title}">${bit}${lsbLabel}</div>`;
+                        }).join('')}
+                    </div>
+                `;
+                channelsContainer.appendChild(channelDiv);
+            });
+
+            // Render Secret Bits (and highlight if needed)
+            secretBitsContainer.innerHTML = ''; // Clear previous
+            secretBits.forEach((bit, i) => {
+                const bitDiv = document.createElement('div');
+                bitDiv.className = `lsb-demo-bit ${currentStep === 1 ? 'secret-highlight' : ''}`;
+                bitDiv.textContent = bit;
+                secretBitsContainer.appendChild(bitDiv);
+            });
+
+            // Update Explanation
+            explanationTitle.textContent = `Explanation (Step ${currentStep + 1}/3)`;
+            explanationTextEl.textContent = explanationTexts[currentStep];
+
+            // Update Button State
+            nextButton.disabled = currentStep === 2;
+            nextButton.innerHTML = currentStep < 2
+                ? `Next Step (${currentStep + 2}/3) <i class="fas fa-arrow-right" aria-hidden="true"></i>`
+                : 'Demo Complete <i class="fas fa-check" aria-hidden="true"></i>'; // Changed icon
+        };
+
+        const getModifiedPixels = (original, secrets) => {
+            const modified = JSON.parse(JSON.stringify(original)); // Deep copy
+            secrets.forEach((bit, i) => {
+                if (modified[i] && modified[i].length === 8) {
+                    modified[i][7] = bit; // Replace LSB
+                }
+            });
+            return modified;
+        };
+
+        const handleNext = () => {
+            if (currentStep < 2) {
+                currentStep++;
+                renderLSBState();
+            }
+        };
+
+        const handleReset = () => {
+            currentStep = 0;
+            renderLSBState();
+        };
+
+        // Event Listeners
+        nextButton.addEventListener('click', handleNext);
+        resetButton.addEventListener('click', handleReset);
+
+        // Initial Render
+        renderLSBState();
+    }
+
+    // --- Adaptive Channel Visualization ---
+    function initAdaptiveDemo() {
+        const container = document.getElementById('adaptive-channel-container');
+        if (!container) return;
+
+        const intensityRange = document.getElementById('intensityRange');
+        const intensityValueEl = document.getElementById('intensityValue');
+        const intensityDisplay = document.getElementById('intensityDisplay');
+        const intensityLabelEl = document.getElementById('intensityLabel');
+        const channelDescEl = document.getElementById('adaptive-channel-description');
+        const channelItems = {
+            red: document.getElementById('channel-red'),
+            green: document.getElementById('channel-green'),
+            blue: document.getElementById('channel-blue')
+        };
+
+        const getActiveChannels = (intensity) => {
+            if (intensity < 85) return ['red', 'green'];    // Dark: Use R+G
+            if (intensity < 170) return ['green', 'blue'];  // Medium: Use G+B
+            return ['red', 'blue'];      // Bright: Use R+B
+        };
+
+        const getIntensityCategory = (intensity) => {
+            if (intensity < 85) return 'Dark';
+            if (intensity < 170) return 'Medium';
+            return 'Bright';
+        };
+
+        const updateAdaptiveVisuals = () => {
+            const intensity = parseInt(intensityRange.value);
+            const category = getIntensityCategory(intensity);
+            const activeChannels = getActiveChannels(intensity);
+
+            // Update Intensity Display
+            intensityValueEl.textContent = intensity;
+            intensityDisplay.style.backgroundColor = `rgb(${intensity}, ${intensity}, ${intensity})`;
+            intensityValueEl.style.color = intensity > 128 ? '#111' : '#eee';
+            intensityLabelEl.textContent = `${category} Pixel Area`;
+            intensityRange.setAttribute('aria-valuetext', `${intensity} (${category})`);
+
+            // Update Channel Description
+            channelDescEl.innerHTML = `For this <strong>${category.toLowerCase()}</strong> pixel area (intensity: ${intensity}), Enhanced LSB embeds data using the LSBs of:`;
+
+            // Update Channel Highlights
+            Object.entries(channelItems).forEach(([key, item]) => {
+                const isActive = activeChannels.includes(key);
+                const statusEl = item.querySelector('.channel-status');
+                item.classList.toggle('active', isActive);
+                statusEl.textContent = isActive ? '(USED)' : '(Skipped)';
+                statusEl.className = `channel-status ${isActive ? 'active' : 'inactive'}`;
+            });
+        };
+
+        // Event Listener
+        intensityRange.addEventListener('input', updateAdaptiveVisuals);
+
+        // Initial Render
+        updateAdaptiveVisuals();
+    }
+
+    
+  </script>
+
+</body>
+</html>

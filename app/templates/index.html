@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Enhanced Secure Message Steganography</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="/static/css/styles.css" rel="stylesheet"> <!-- Link to the CSS file -->
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">
+        <i class="fas fa-user-secret logo-icon"></i>
+        <h1>Secure Steganography</h1>
+      </div>
+      <div class="header-buttons">
+        <a href="/explanation" class="info-button">
+          <i class="fas fa-info-circle"></i>
+          <span>How It Works</span>
+        </a>
+        <button class="theme-toggle" id="themeToggle">
+          <i class="fas fa-moon"></i>
+          <span>Dark Mode</span>
+        </button>
+      </div>
+    </header>
+
+    <main>
+      <div class="main-content">
+
+        <!-- Key Management Card -->
+        <div class="card">
+          <h2><i class="fas fa-key"></i> Encryption Key</h2>
+          <div class="button-group">
+            <button id="generateKey"><i class="fas fa-plus-circle"></i> Generate New Key</button>
+            <button class="secondary" id="loadKey"><i class="fas fa-upload"></i> Load Key From File</button>
+          </div>
+
+          <div class="key-display-container" id="keyDisplayContainer" style="display: none;">
+            <label for="currentKey">Current Key:</label>
+            <div class="key-display-wrapper">
+              <input type="password" id="currentKey" class="key-display" readonly>
+              <button id="toggleKeyVisibility" class="small"><i class="fas fa-eye"></i></button>
+            </div>
+            <div class="key-actions">
+              <button class="secondary small" id="copyKey"><i class="fas fa-copy"></i> Copy Key</button>
+            </div>
+          </div>
+
+          <div id="keyStatus" style="margin-top: 0.8rem; font-size: 0.9rem; display: none;">
+            <!-- Status updated by JS -->
+            </div>
+
+          <div class="info-callout">
+            <i class="fas fa-info-circle"></i> Provide a key for hiding. For extraction, it's only needed if the 'Embed Key' option was disabled during hiding.
+          </div>
+        </div>
+
+        <!-- Tabs Card -->
+        <div class="card">
+          <div class="tabs">
+            <button class="tab-button active" data-tab="hideTabContent"><i class="fas fa-eye-slash"></i> Hide Message</button>
+            <button class="tab-button" data-tab="extractTabContent"><i class="fas fa-search"></i> Extract Message</button>
+            <button class="tab-button" data-tab="batchTabContent"><i class="fas fa-layer-group"></i> Batch Processing</button>
+          </div>
+
+          <!-- Hide Tab Content -->
+          <div class="tab-content active" id="hideTabContent">
+             <div class="form-group">
+               <label for="message">Secret Message:</label>
+               <textarea id="message" rows="4" placeholder="Enter your secret message here..."></textarea>
+             </div>
+             <div class="form-group">
+                 <label>Or Hide a File Instead <span class="tooltip"><i class="fas fa-info-circle"></i><span class="tooltip-text">If you select a file here, it replaces the text message above - the whole file (any type: PDF, Word, Excel, another image, etc.) is hidden instead, size permitting.</span></span>:</label>
+                 <div class="file-input-wrapper" id="payloadDropArea">
+                     <i class="fas fa-file-upload"></i>
+                     <p>Drag & drop any file here or click</p>
+                     <p class="file-info">Overrides the text message above if provided</p>
+                     <input type="file" id="payloadFileInput" style="display: none;">
+                 </div>
+                 <div id="payloadFileDisplay" class="file-display" style="display: none;">
+                     <i class="fas fa-check-circle"></i><span id="payloadFilename"></span>
+                     <button class="secondary small" id="clearPayloadFile" style="margin-left: auto;"><i class="fas fa-times"></i></button>
+                 </div>
+             </div>
+             <div class="form-group">
+                 <label>Cover Image:</label>
+                 <div class="file-input-wrapper" id="coverDropArea">
+                     <i class="fas fa-image"></i>
+                     <p>Drag & drop cover image here or click</p>
+                     <p class="file-info">Supports any image format (PNG, JPEG, WEBP, HEIC, AVIF, TIFF, BMP, GIF...)</p>
+                     <input type="file" id="coverFileInput" accept="image/*" style="display: none;">
+                 </div>
+                 <div id="coverFileDisplay" class="file-display" style="display: none;">
+                     <i class="fas fa-check-circle"></i><span id="coverFilename"></span>
+                 </div>
+             </div>
+             <div class="form-group" style="display: none;">
+                <label>Output Directory:</label>
+                <div class="input-group">
+                  <input type="text" id="outputPath" placeholder="Select directory to save stego image..." readonly>
+                  <button class="secondary" id="browseOutput"><i class="fas fa-folder-open"></i> Browse</button>
+                </div>
+             </div>
+             <button id="hideMessage"><i class="fas fa-lock"></i> Hide Message</button>
+             <div class="progress-container" id="hideProgress" style="display: none;">
+               <div class="progress-bar"><div class="progress" id="hideProgressBar"></div></div>
+               <div class="progress-text" id="hideProgressText">0%</div>
+             </div>
+             <div class="form-group" style="margin-top: 1.5rem;">
+                 <label for="encryptedMessage">Encrypted Ciphertext (for reference):</label>
+                 <textarea id="encryptedMessage" rows="3" placeholder="AES encrypted data will appear here..." readonly></textarea>
+                 <div class="textarea-actions">
+                     <button class="secondary small" id="toggleEncryptedVisibility"><i class="fas fa-eye"></i> Show/Hide</button>
+                     <button class="secondary small" id="copyEncrypted"><i class="fas fa-copy"></i> Copy</button>
+                 </div>
+             </div>
+             <div class="form-group">
+                 <label for="encryptedKey">Encrypted Key (embedded form, for reference):</label>
+                 <textarea id="encryptedKey" rows="2" placeholder="Encrypted key data (if embedded) will appear here..." readonly></textarea>
+                  <div class="textarea-actions">
+                     <button class="secondary small" id="toggleEncryptedKeyVisibility"><i class="fas fa-eye"></i> Show/Hide</button>
+                     <button class="secondary small" id="copyEncryptedKey"><i class="fas fa-copy"></i> Copy</button>
+                 </div>
+             </div>
+          </div>
+
+          <!-- Extract Tab Content -->
+          <div class="tab-content" id="extractTabContent">
+              <div class="form-group">
+                 <label>Stego Image:</label>
+                  <div class="file-input-wrapper" id="stegoDropArea">
+                     <i class="fas fa-file-image"></i>
+                     <p>Drag & drop stego image here or click</p>
+                     <p class="file-info">Supports any image format (PNG, JPEG, WEBP, HEIC, AVIF, TIFF, BMP, GIF...)</p>
+                      <input type="file" id="stegoFileInput" accept="image/*" style="display: none;">
+                 </div>
+                  <div id="stegoFileDisplay" class="file-display" style="display: none;">
+                     <i class="fas fa-check-circle"></i><span id="stegoFilename"></span>
+                 </div>
+             </div>
+             <button id="extractMessage"><i class="fas fa-unlock"></i> Extract Message</button>
+             <div class="progress-container" id="extractProgress" style="display: none;">
+               <div class="progress-bar"><div class="progress" id="extractProgressBar"></div></div>
+               <div class="progress-text" id="extractProgressText">0%</div>
+             </div>
+             <div class="form-group" style="margin-top: 1.5rem;">
+                 <label>Extracted Message:</label>
+                 <textarea id="extractedText" rows="4" placeholder="Extracted message will appear here..." readonly></textarea>
+             </div>
+             <div class="form-group" id="extractedFileContainer" style="display: none;">
+                 <label>Extracted File:</label>
+                 <div class="file-display" style="display: flex;">
+                     <i class="fas fa-file-alt"></i><span id="extractedFileInfo"></span>
+                     <button class="secondary small" id="downloadExtractedFile" style="margin-left: auto;"><i class="fas fa-download"></i> Download</button>
+                 </div>
+             </div>
+             <div class="form-group">
+                 <label for="encryptedExtracted">Raw Encrypted Data (before decryption):</label>
+                 <textarea id="encryptedExtracted" rows="3" placeholder="Raw encrypted data extracted from image..." readonly></textarea>
+                  <div class="textarea-actions">
+                     <button class="secondary small" id="toggleEncryptedExtractedVisibility"><i class="fas fa-eye"></i> Show/Hide</button>
+                     <button class="secondary small" id="copyEncryptedExtracted"><i class="fas fa-copy"></i> Copy</button>
+                 </div>
+             </div>
+             <div class="form-group">
+                 <label for="extractedKey">Extracted Key (if found):</label>
+                 <textarea id="extractedKey" rows="2" placeholder="Key extracted from image (if embedded)..." readonly></textarea>
+                  <div class="textarea-actions">
+                     <button class="secondary small" id="toggleExtractedKeyVisibility"><i class="fas fa-eye"></i> Show/Hide</button>
+                     <button class="secondary small" id="copyExtractedKey"><i class="fas fa-copy"></i> Copy</button>
+                 </div>
+             </div>
+              <div class="form-group">
+                 <label for="rawEncryptedKey">Raw Encrypted Key Data (if found):</label>
+                 <textarea id="rawEncryptedKey" rows="2" placeholder="Raw key data before decryption..." readonly></textarea>
+                  <div class="textarea-actions">
+                     <button class="secondary small" id="toggleRawKeyVisibility"><i class="fas fa-eye"></i> Show/Hide</button>
+                     <button class="secondary small" id="copyRawKey"><i class="fas fa-copy"></i> Copy</button>
+                 </div>
+             </div>
+          </div>
+
+          <!-- Batch Processing Tab Content -->
+          <div class="tab-content" id="batchTabContent">
+            <div class="info-callout"><i class="fas fa-info-circle"></i> Process multiple images using the same settings and message/key. Results and graphs will appear in the sidebar after processing.</div>
+
+            <div class="batch-section">
+                <h3><i class="fas fa-folder-plus"></i> Batch Hide</h3>
+                <div class="form-group">
+                    <label for="batchMessage">Secret Message (applied to all images):</label>
+                    <textarea id="batchMessage" rows="3" placeholder="Enter the secret message for all cover images..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Or Hide a File Instead (applied to all images) <span class="tooltip"><i class="fas fa-info-circle"></i><span class="tooltip-text">If you select a file here, it replaces the text message above and is hidden in every cover image in this batch.</span></span>:</label>
+                    <div class="file-input-wrapper" id="batchPayloadDropArea">
+                        <i class="fas fa-file-upload"></i>
+                        <p>Drag & drop any file here or click</p>
+                        <p class="file-info">Overrides the text message above if provided</p>
+                        <input type="file" id="batchPayloadFileInput" style="display: none;">
+                    </div>
+                    <div id="batchPayloadFileDisplay" class="file-display" style="display: none;">
+                        <i class="fas fa-check-circle"></i><span id="batchPayloadFilename"></span>
+                        <button class="secondary small" id="clearBatchPayloadFile" style="margin-left: auto;"><i class="fas fa-times"></i></button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Cover Images:</label>
+                    <div class="file-input-wrapper" id="batchCoverDropArea">
+                        <i class="fas fa-images"></i>
+                        <p>Drag & drop cover images here or click</p>
+                        <p class="file-info">Select multiple image files (any format)</p>
+                        <input type="file" id="batchCoverInput" accept="image/*" multiple style="display: none;">
+                    </div>
+                    <label>Selected Cover Files (<span id="batchCoverFileCount">0</span>):</label>
+                    <div class="file-list-container">
+                        <ul id="batchCoverFileList"></ul>
+                    </div>
+                    <button class="secondary small" id="clearBatchCoverFiles" style="margin-top: -0.5rem;"><i class="fas fa-times"></i> Clear List</button>
+                </div>
+                 <div class="form-group" style="display: none;">
+                   <label>Output Directory (for all generated images):</label>
+                   <div class="input-group">
+                     <input type="text" id="batchOutputPath" placeholder="Select directory to save stego images..." readonly>
+                     <button class="secondary" id="batchBrowseOutput"><i class="fas fa-folder-open"></i> Browse</button>
+                   </div>
+                 </div>
+                 <button id="startBatchHide"><i class="fas fa-cogs"></i> Start Batch Hide</button>
+
+                 <div class="progress-container batch-progress-container" id="batchHideProgress" style="display: none;">
+                   <div class="progress-bar"><div class="progress" id="batchHideProgressBar"></div></div>
+                   <div class="progress-text" id="batchHideProgressText">Processing...</div>
+                 </div>
+
+                 <div class="batch-results-container" id="batchHideResultsContainer" style="display: none;">
+                    <table class="batch-results-table">
+                      <thead>
+                        <tr>
+                            <th>Filename</th>
+                            <th>Status</th>
+                            <th>Output Path</th>
+                            <th>PSNR</th>
+                            <th>SSIM</th>
+                            <th>Capacity</th>
+                            <th>BER</th>
+                            <th>Msg</th>
+                            <th>Key</th>
+                            <th>EncMsg</th>
+                            <th>EncKey</th>
+                        </tr>
+                    </thead>
+                    <tbody id="batchHideResultsBody"></tbody>
+                    </table>
+                 </div>
+            </div>
+
+             <div class="batch-section">
+                <h3><i class="fas fa-search-plus"></i> Batch Extract</h3>
+                 <div class="form-group">
+                    <label>Stego Images:</label>
+                    <div class="file-input-wrapper" id="batchStegoDropArea">
+                        <i class="fas fa-file-image"></i>
+                        <p>Drag & drop stego images here or click</p>
+                        <p class="file-info">Select multiple image files (any format)</p>
+                         <input type="file" id="batchStegoInput" accept="image/*" multiple style="display: none;">
+                    </div>
+                     <label>Selected Stego Files (<span id="batchStegoFileCount">0</span>):</label>
+                     <div class="file-list-container">
+                         <ul id="batchStegoFileList"></ul>
+                     </div>
+                    <button class="secondary small" id="clearBatchStegoFiles" style="margin-top: -0.5rem;"><i class="fas fa-times"></i> Clear List</button>
+                 </div>
+                  <button id="startBatchExtract"><i class="fas fa-cogs"></i> Start Batch Extract</button>
+
+                  <div class="progress-container batch-progress-container" id="batchExtractProgress" style="display: none;">
+                    <div class="progress-bar"><div class="progress" id="batchExtractProgressBar"></div></div>
+                    <div class="progress-text" id="batchExtractProgressText">Processing...</div>
+                  </div>
+
+                  <div class="batch-results-container" id="batchExtractResultsContainer" style="display: none;">
+                     <table class="batch-results-table">
+                      <thead>
+                        <tr>
+                            <th>Filename</th>
+                            <th>Status</th>
+                            <th>Extracted Msg</th>
+                            <th>Extracted Key</th>
+                            <th>Raw Enc. Msg</th>
+                            <th>Raw Enc. Key</th>
+                       </tr>
+                    </thead>
+                    <tbody id="batchExtractResultsBody"></tbody>
+                     </table>
+                  </div>
+            </div>
+
+          </div> <!-- End batchTabContent -->
+        </div> <!-- End Tabs Card -->
+      </div> <!-- End main-content -->
+
+      <div class="sidebar">
+
+        <!-- Preview Card -->
+        <div class="card">
+          <h2><i class="fas fa-images"></i> Image Preview (Single Mode)</h2>
+          <div class="preview-container">
+            <div class="preview-box">
+              <img id="coverPreview" src="/api/placeholder/400/320" alt="Cover Image Preview">
+              <div class="label">Cover Image</div>
+            </div>
+            <div class="preview-box">
+              <img id="outputPreview" src="/api/placeholder/400/320" alt="Output Image Preview">
+              <div class="label">Stego Image</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Performance Metrics Card -->
+        <div class="card">
+          <h2><i class="fas fa-tachometer-alt"></i> Performance Metrics</h2>
+           <p style="font-size: 0.85rem; color: var(--medium-text); margin-bottom: 1rem;">Metrics are updated after a single hide operation or averaged after batch hide.</p>
+          <div class="metrics">
+            <div class="metric-card">
+              <div class="metric-title">PSNR <span class="tooltip"><i class="fas fa-info-circle"></i><span class="tooltip-text">Peak Signal-to-Noise Ratio. Higher is better (> 35dB often considered good).</span></span></div>
+              <div class="metric-value" id="psnrValue">--</div>
+              <div class="metric-bar"><div class="metric-progress" id="psnrBar"></div></div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-title">SSIM <span class="tooltip"><i class="fas fa-info-circle"></i><span class="tooltip-text">Structural Similarity Index. Closer to 1 is better (> 0.95 is often very good).</span></span></div>
+              <div class="metric-value" id="ssimValue">--</div>
+              <div class="metric-bar"><div class="metric-progress" id="ssimBar"></div></div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-title">BER <span class="tooltip"><i class="fas fa-info-circle"></i><span class="tooltip-text">Bit Error Rate. Lower is better (ideally 0).</span></span></div>
+              <div class="metric-value" id="berValue">--</div>
+              <div class="metric-bar"><div class="metric-progress" id="berBar"></div></div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-title">Capacity <span class="tooltip"><i class="fas fa-info-circle"></i><span class="tooltip-text">Payload Capacity in bits per pixel (bpp).</span></span></div>
+              <div class="metric-value" id="capacityValue">--</div>
+              <div class="metric-bar"><div class="metric-progress" id="capacityBar"></div></div>
+            </div>
+          </div>
+        </div> <!-- End Performance Metrics Card -->
+
+        <!-- Batch Performance Graphs Card (Moved Here) -->
+        <div class="card" id="batchGraphsCard" style="display: none;"> <!-- Initially hidden -->
+           <h2><i class="fas fa-chart-area"></i> Batch Performance Analysis</h2>
+           <div class="batch-graphs-content" id="batchGraphsContent">
+              <div class="graph-slider-container" id="graphSliderContainer">
+                  <!-- Initial Loading State -->
+                  <div class="initial-loading-graphs">
+                      <i class="fas fa-spinner fa-spin"></i> Generating graphs...
+        </div>
+                  <!-- Slider structure will be built here by JS -->
+              </div>
+           </div>
+        </div> <!-- End Batch Performance Graphs Card -->
+
+        <!-- Advanced Settings Card -->
+        <div class="card">
+          <h2><i class="fas fa-sliders-h"></i> Advanced Settings</h2>
+          <div class="settings-grid">
+             <div class="toggle-group">
+                <span>Use AES-256 <span class="tooltip"><i class="fas fa-info-circle"></i><span class="tooltip-text">Encrypt message with AES-256. Requires a key.</span></span></span>
+                <label class="toggle"><input type="checkbox" id="useAES" checked><span class="slider"></span></label>
+            </div>
+             <div class="toggle-group">
+                <span>Embed Key <span class="tooltip"><i class="fas fa-info-circle"></i><span class="tooltip-text">Embed encryption key within image. Simplifies extraction but relies on master key derivation security.</span></span></span>
+                <label class="toggle"><input type="checkbox" id="embedKey" checked><span class="slider"></span></label>
+            </div>
+             <div class="toggle-group">
+                <span>Enhanced Bit Dist. <span class="tooltip"><i class="fas fa-info-circle"></i><span class="tooltip-text">Use pixel intensity to distribute bits (improves stealth).</span></span></span>
+                <label class="toggle"><input type="checkbox" id="enhancedBit" checked><span class="slider"></span></label>
+            </div>
+             <div class="toggle-group">
+                <span>Adaptive Channel <span class="tooltip"><i class="fas fa-info-circle"></i><span class="tooltip-text">Dynamically select color channels based on pixel properties (requires Enhanced Bit).</span></span></span>
+                <label class="toggle"><input type="checkbox" id="adaptiveChannel" checked><span class="slider"></span></label>
+            </div>
+             <div class="toggle-group">
+                <span>Error Correction <span class="tooltip"><i class="fas fa-info-circle"></i><span class="tooltip-text">Add redundancy for better extraction reliability (especially if AES is off).</span></span></span>
+                <label class="toggle"><input type="checkbox" id="errorCorrection" checked><span class="slider"></span></label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Log Card -->
+        <div class="card">
+          <h2><i class="fas fa-clipboard-list"></i> Operation Log</h2>
+          <div class="log-container" id="logContainer">
+            <!-- Log entries will be added here -->
+            </div>
+        </div>
+
+      </div> <!-- End sidebar -->
+
+      <!-- Removed the full-width graph card from here -->
+
+    </main>
+  </div> <!-- End container -->
+
+  <div class="notification" id="notification"></div>
+
+  <!-- Directory Browser Modal -->
+  <div class="modal" id="directoryModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2><i class="fas fa-folder-open"></i> <span id="modalTitle">Select Directory</span></h2>
+        <button class="close-modal" id="closeModal">×</button>
+      </div>
+      <div class="directory-path" id="currentPath">/output</div>
+      <ul class="directory-list" id="directoryList"></ul>
+      <div class="modal-footer">
+         <button class="secondary" id="cancelDirectorySelect"><i class="fas fa-times"></i> Cancel</button>
+         <button id="selectDirectory"><i class="fas fa-check"></i> Select This Directory</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="fullscreen-modal" id="fullscreenGraphModal">
+    <button class="close-fullscreen-button" id="closeFullscreenGraph" aria-label="Close fullscreen graph">×</button>
+    <img src="" alt="Fullscreen Graph" id="fullscreenGraphImage">
+  </div>
+  
+<script src="/static/js/script.js"></script> <!-- Link to the JavaScript file -->
+
+</body>
+</html>

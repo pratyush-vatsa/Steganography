@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: stego-web
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: bash deploy/start.sh
+    envVars:
+      - key: STEGO_BASE_DIR
+        value: /tmp/stego-data
+      - key: SECRET_KEY
+        generateValue: true

@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Flowchart - Secure Steganography</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css" rel="stylesheet" id="prism-dark-theme" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" rel="stylesheet" id="prism-light-theme" disabled />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/toolbar/prism-toolbar.min.css" rel="stylesheet" />
+
+    <!-- Full CSS from Explanation.html / demos.html -->
+    <style>
+        /* --- Base & Variables --- */
+        :root {
+            --primary: #4f46e5;
+            --primary-light: #818cf8;
+            --primary-dark: #3730a3;
+            --secondary: #06b6d4;
+            --accent: #f472b6;
+            --dark: #1e293b; /* Dark text / Light BG element */
+            --light: #f8fafc; /* Light text / Dark BG element */
+            --bg-light: #f8fafc;
+            --bg-dark: #0f172a;
+            --card-bg-light: rgba(255, 255, 255, 0.95);
+            --card-bg-dark: rgba(30, 41, 59, 0.9); /* Slightly less transparent */
+            --card-border-light: rgba(79, 70, 229, 0.1);
+            --card-border-dark: rgba(129, 140, 248, 0.15);
+            --code-bg-light: #f8f8f2; /* Light theme code background */
+            --code-bg-dark: #282a36; /* Dark theme code background (Okaidia-like) */
+            --input-bg: rgba(255, 255, 255, 0.05); /* For dark mode input */
+             --input-text: var(--light); /* For dark mode input */
+             --border-color: var(--card-border-dark); /* Default to dark */
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --container-shadow: var(--shadow-xl);
+            --gradient: linear-gradient(135deg, var(--primary), var(--secondary));
+            --text-light: #64748b; /* Lighter text for secondary info */
+            --text-dark: var(--dark);
+            --warning: #f97316; /* Orange for warnings */
+            --error: #ef4444; /* Red for errors/low robustness */
+            --success: #22c55e; /* Green for success/good */
+            --medium-text: #a0a0b0; /* Added for consistency */
+            --header-height: 80px; /* Approximate header height */
+            --button-radius: 8px;
+            --card-radius: 12px;
+            --transition: all 0.3s ease-in-out;
+        }
+
+        /* --- Dark Mode Overrides --- */
+        html[data-theme="dark"] {
+            --primary: #818cf8;
+            --primary-light: #a5b4fc;
+            --primary-dark: #6366f1;
+            --secondary: #22d3ee;
+            --accent: #f9a8d4;
+            --dark: #f8fafc; /* Dark text becomes light */
+            --light: #0f172a; /* Light text becomes dark */
+            --bg-main: var(--bg-dark);
+            --text-main: var(--dark); /* Use light text on dark bg */
+            --text-muted: #94a3b8; /* Adjusted muted text for dark */
+            --card-bg: var(--card-bg-dark);
+            --card-border: var(--card-border-dark);
+            --code-bg: var(--code-bg-dark);
+            --container-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.3);
+            --warning: #fb923c; /* Lighter orange */
+            --error: #f87171; /* Lighter red */
+            --success: #4ade80; /* Lighter green */
+            --input-bg: rgba(255, 255, 255, 0.05); /* Explicit dark input bg */
+            --input-text: var(--light); /* Explicit dark input text */
+             --border-color: var(--card-border-dark); /* Explicit dark border */
+             --medium-text: #94a3b8; /* Dark mode medium text (Adjusted) */
+        }
+         /* Light Mode Explicit Overrides */
+         html[data-theme="light"] {
+             --primary: #6366f1;
+             --primary-light: #818cf8;
+             --secondary: #06b6d4;
+             --accent: #f472b6;
+             --dark: #1e293b;
+             --light: #f8fafc;
+             --bg-main: var(--bg-light);
+             --text-main: var(--text-dark);
+             --text-muted: var(--text-light);
+             --card-bg: var(--card-bg-light);
+             --card-border: var(--card-border-light);
+             --code-bg: var(--code-bg-light);
+              --input-bg: rgba(241, 245, 249, 0.9);
+             --input-text: #334155;
+             --border-color: var(--card-border-light);
+             --medium-text: #64748b;
+             --warning: #f97316;
+             --error: #ef4444;
+             --success: #22c55e;
+             --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+         }
+
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; scroll-padding-top: calc(var(--header-height) + 20px); }
+        body {
+          font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+          background-color: var(--bg-main);
+          color: var(--text-main);
+          font-size: 16px;
+          line-height: 1.7;
+          transition: background-color 0.4s ease, color 0.4s ease;
+          overflow-x: hidden;
+        }
+        /* --- Layout & Container --- */
+        .page-wrapper { display: flex; flex-direction: column; min-height: 100vh; }
+        .content-wrapper { flex: 1; }
+        .main-content { flex: 1; padding: 0 2rem; max-width: 1400px; /* Wider for two columns */ margin: 0 auto; }
+        .container { width: 100%; margin: 0 auto; }
+
+         /* --- Background Pattern --- */
+        .bg-pattern { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; opacity: 0.05; pointer-events: none; background-image: radial-gradient(var(--primary) 0.5px, transparent 0.5px); background-size: 25px 25px; transition: opacity 0.4s ease; }
+         html[data-theme="dark"] .bg-pattern { opacity: 0.07; background-image: radial-gradient(var(--primary-light) 0.5px, transparent 0.5px); }
+
+         /* --- Header --- */
+        header { padding: 1.5rem 2rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background-color: var(--card-bg); backdrop-filter: blur(12px); z-index: 50; transition: background-color 0.4s ease, border-color 0.4s ease; height: var(--header-height); }
+        .logo { display: flex; align-items: center; gap: 1rem; }
+        .logo h1 { font-size: 1.8rem; font-weight: 700; background: var(--gradient); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .logo-icon { font-size: 2rem; color: var(--primary); animation: pulse 2.5s infinite ease-in-out; }
+        .header-buttons { display: flex; gap: 0.8rem; align-items: center; }
+
+        /* Theme Toggle Button */
+        .theme-toggle { background: transparent; border: 1px solid var(--border-color); color: var(--medium-text); padding: 0.6rem 1.1rem; border-radius: 50px; cursor: pointer; display: flex; align-items: center; gap: 0.6rem; font-weight: 500; transition: all 0.3s ease; font-size: 0.9rem; }
+        .theme-toggle:hover { color: var(--primary); border-color: var(--primary); background-color: rgba(79, 70, 229, 0.05); }
+        html[data-theme="dark"] .theme-toggle:hover { background-color: rgba(129, 140, 248, 0.08); }
+        .theme-toggle i { width: 1em; text-align: center; }
+
+        /* Return Button */
+        .return-button { display: inline-flex; align-items: center; gap: 0.6rem; background: transparent; border: 1px solid var(--border-color); color: var(--medium-text); padding: 0.6rem 1.1rem; border-radius: 50px; text-decoration: none; font-weight: 500; transition: all 0.3s ease; font-size: 0.9rem; }
+        .return-button:hover { color: var(--secondary); border-color: var(--secondary); background-color: rgba(6, 182, 212, 0.05); }
+        html[data-theme="dark"] .return-button:hover { background-color: rgba(34, 211, 238, 0.08); }
+        .return-button i { font-size: 0.9em; }
+
+        /* --- Sections (General) --- */
+        .section { padding: 2.5rem; margin: 2.5rem 0; background: var(--card-bg); border-radius: 1rem; box-shadow: var(--shadow-md); transition: all 0.4s ease; border: 1px solid var(--border-color); }
+        .section-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem;}
+        .section-header h2 { font-size: 2rem; font-weight: 700; color: var(--primary); margin: 0; }
+        .section-header i { font-size: 1.5rem; color: var(--primary); background-color: rgba(79, 70, 229, 0.1); width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        html[data-theme="dark"] .section-header i { background-color: rgba(129, 140, 248, 0.15); }
+        .section > p:first-of-type { font-size: 1.1rem; color: var(--text-muted); margin-bottom: 1.5rem; }
+
+         /* General Button Styling */
+        button, .button { background: var(--gradient); color: white; border: none; padding: 0.9rem 1.8rem; border-radius: var(--button-radius); font-weight: 600; cursor: pointer; transition: var(--transition); display: inline-flex; align-items: center; justify-content: center; gap: 0.6rem; font-size: 0.95rem; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); text-decoration: none; line-height: 1; }
+        button:hover, .button:hover { transform: translateY(-2px); box-shadow: 0 7px 20px rgba(79, 70, 229, 0.4); }
+        html[data-theme="dark"] button:hover, html[data-theme="dark"] .button:hover { box-shadow: 0 7px 20px rgba(129, 140, 248, 0.4); }
+        button:active, .button:active { transform: translateY(0); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); }
+        button.secondary, .button.secondary { background: transparent; border: 1px solid var(--border-color); color: var(--medium-text); box-shadow: none; padding: 0.7rem 1.2rem; }
+        button.secondary:hover, .button.secondary:hover { border-color: var(--primary); color: var(--primary); background: rgba(79, 70, 229, 0.1); transform: none; box-shadow: none; }
+        html[data-theme="dark"] button.secondary:hover, html[data-theme="dark"] .button.secondary:hover { background: rgba(129, 140, 248, 0.15); }
+        button:disabled, .button:disabled { background: var(--input-bg); color: var(--medium-text); cursor: not-allowed; box-shadow: none; opacity: 0.6; transform: none; }
+        html[data-theme="light"] button:disabled, html[data-theme="light"] .button:disabled { background: #e2e8f0; }
+
+         /* --- Footer --- */
+        footer { margin-top: 6rem; text-align: center; padding: 3rem 2rem; color: var(--text-muted); opacity: 0.9; font-size: 0.95rem; border-top: 1px solid var(--border-color); background-color: var(--card-bg); transition: background-color 0.4s ease, border-color 0.4s ease; }
+         .footer-content { max-width: 800px; margin: 0 auto; }
+         .footer-links { display: flex; justify-content: center; gap: 2rem; margin-top: 1rem; flex-wrap: wrap; }
+         .footer-links a { color: var(--text-muted); text-decoration: none; transition: color 0.3s ease; display: inline-flex; align-items: center; gap: 0.5rem; }
+         .footer-links a:hover { color: var(--primary); }
+         .footer-links a i { margin-right: 0.5em; }
+
+        /* --- Back to Top Button --- */
+        .back-to-top { position: fixed; bottom: 30px; right: 30px; width: 50px; height: 50px; border-radius: 50%; background: var(--primary); color: white; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: all 0.4s ease; transform: translateY(100px) scale(0.8); opacity: 0; border: none; box-shadow: var(--shadow-lg); z-index: 100; font-size: 1.2rem; }
+        .back-to-top.show { transform: translateY(0) scale(1); opacity: 1; }
+        .back-to-top:hover { background: var(--primary-light); transform: translateY(-5px) scale(1.05); }
+
+        /* === FLOWCHART PAGE SPECIFIC STYLES === */
+        .flowchart-layout {
+            display: flex;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .flowchart-diagram-wrapper {
+            flex: 3; /* Takes more space */
+            overflow-y: auto;
+            max-height: calc(100vh - var(--header-height) - 150px);
+            padding: 0 1rem 1rem 0; /* Adjusted padding */
+            border: 1px solid var(--border-color);
+            border-radius: var(--card-radius);
+            background-color: var(--input-bg);
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary) transparent;
+        }
+        .flowchart-diagram-wrapper::-webkit-scrollbar { width: 8px; }
+        .flowchart-diagram-wrapper::-webkit-scrollbar-track { background: rgba(0,0,0,0.05); border-radius: 4px; }
+        html[data-theme="dark"] .flowchart-diagram-wrapper::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
+        .flowchart-diagram-wrapper::-webkit-scrollbar-thumb { background-color: var(--primary); border-radius: 4px; }
+
+        .flowchart-diagram {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            align-items: start;
+            padding: 1.5rem; /* Padding inside */
+        }
+
+        .flowchart-lane {
+            padding: 0;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .flowchart-lane h4 {
+            text-align: center; color: var(--medium-text); font-size: 0.9rem;
+            margin-bottom: 1rem; font-weight: 600;
+            border-bottom: 1px dashed var(--border-color); padding-bottom: 0.5rem;
+            width: 95%; display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+        }
+
+        .flowchart-node {
+            background-color: var(--card-bg); padding: 0.8rem 1rem;
+            border-radius: 8px; border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-sm); text-align: center; transition: all 0.3s ease;
+            position: relative; width: 90%; font-size: 0.85rem; cursor: default;
+            min-height: 65px; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; border-left-width: 4px;
+        }
+        .flowchart-node.user-input { border-left-color: var(--accent); }
+        .flowchart-node.api-process { border-left-color: var(--secondary); }
+        .flowchart-node.core-process { border-left-color: var(--primary); }
+        .flowchart-node.data { border-left-color: var(--success); }
+        .flowchart-node.output { border-left-color: var(--warning); background-color: rgba(249, 115, 22, 0.05); }
+        html[data-theme="dark"] .flowchart-node.output { background-color: rgba(251, 191, 116, 0.1); }
+        .flowchart-node i { font-size: 1rem; margin-bottom: 0.4rem; color: var(--primary-light); }
+        .flowchart-node.user-input i { color: var(--accent); }
+        .flowchart-node.api-process i { color: var(--secondary); }
+        .flowchart-node.core-process i { color: var(--primary); }
+        .flowchart-node.data i { color: var(--success); }
+        .flowchart-node.output i { color: var(--warning); }
+        .flowchart-node.active {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.3), var(--shadow-md);
+            transform: scale(1.03); z-index: 5;
+        }
+        html[data-theme="dark"] .flowchart-node.active {
+            box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.4), var(--shadow-md);
+        }
+        .flowchart-node::after { display: none; } /* Arrows removed */
+
+        /* Right Column: Info and Controls */
+        .flowchart-info-wrapper {
+            flex: 2; position: sticky; top: calc(var(--header-height) + 2rem);
+            height: calc(100vh - var(--header-height) - 4rem); display: flex;
+            flex-direction: column;
+        }
+        .flowchart-controls {
+            display: flex; justify-content: center; gap: 1rem;
+            margin-bottom: 1.5rem; padding-bottom: 0; border-bottom: none; flex-shrink: 0;
+        }
+        .flowchart-controls .flow-button {
+            padding: 0.7rem 1.5rem; font-size: 0.95rem; background: transparent;
+            border: 1px solid var(--border-color); color: var(--medium-text); box-shadow: none;
+        }
+        .flowchart-controls .flow-button.active {
+            border-color: var(--primary); color: var(--primary);
+            background: rgba(79, 70, 229, 0.1); font-weight: 600;
+        }
+        html[data-theme="dark"] .flowchart-controls .flow-button.active {
+             background: rgba(129, 140, 248, 0.15);
+        }
+        .flowchart-step-info {
+            background-color: var(--card-bg); border: 1px solid var(--border-color);
+            padding: 1.5rem; border-radius: var(--card-radius); box-shadow: var(--shadow-md);
+            flex-grow: 1; overflow-y: auto; margin-bottom: 1.5rem;
+            scrollbar-width: thin; scrollbar-color: var(--primary) transparent;
+        }
+        .flowchart-step-info::-webkit-scrollbar { width: 6px; }
+        .flowchart-step-info::-webkit-scrollbar-track { background: rgba(0,0,0,0.05); border-radius: 3px; }
+        html[data-theme="dark"] .flowchart-step-info::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
+        .flowchart-step-info::-webkit-scrollbar-thumb { background-color: var(--primary); border-radius: 3px; }
+        .flowchart-step-info h3 { font-size: 1.15rem; color: var(--primary); margin-bottom: 1rem; font-weight: 600; }
+        .flowchart-step-info p { color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; }
+        .flowchart-step-info p strong { color: var(--text-main); font-weight: 600; }
+        .flowchart-step-info code { background-color: var(--input-bg); padding: 0.2em 0.4em; border-radius: 4px; font-size: 0.9em; font-family: 'Fira Code', monospace; color: var(--accent); border: 1px solid var(--border-color); }
+        .flowchart-navigation {
+            display: flex; justify-content: space-between; align-items: center;
+            padding-top: 1rem; border-top: 1px solid var(--border-color); flex-shrink: 0;
+        }
+        #stepCounter { font-size: 0.9rem; color: var(--medium-text); font-weight: 500; }
+        .flowchart-navigation button { min-width: 110px; padding: 0.7rem 1.2rem; font-size: 0.9rem; }
+
+        /* Responsive Flowchart Layout */
+        @media (max-width: 1100px) {
+            .flowchart-layout { flex-direction: column; }
+            .flowchart-diagram-wrapper { max-height: 50vh; flex: none; margin-bottom: 1.5rem; padding-right: 0.5rem;}
+            .flowchart-info-wrapper { position: static; height: auto; flex: none; max-height: none;}
+            .flowchart-diagram { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+        }
+         @media (max-width: 768px) {
+             .flowchart-diagram { grid-template-columns: 1fr; }
+             .flowchart-lane { border-bottom: 1px dashed var(--border-color); padding-bottom: 1rem; }
+             .flowchart-lane:last-child { border-bottom: none; }
+             .flowchart-node { width: 95%; }
+             .section { padding: 1.5rem; margin: 1.5rem 0; }
+             .section-header h2 { font-size: 1.6rem; }
+             .flowchart-controls .flow-button { padding: 0.6rem 1.2rem; font-size: 0.9rem; }
+             .flowchart-step-info { padding: 1rem; }
+             .flowchart-step-info h3 { font-size: 1.1rem; }
+             .flowchart-navigation button { padding: 0.7rem 1rem; font-size: 0.85rem; min-width: 90px; }
+         }
+
+        /* Screen Reader only text */
+        .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0; }
+        @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.05); opacity: 0.9; } 100% { transform: scale(1); opacity: 1; } }
+    </style>
+</head>
+<body>
+    <div class="bg-pattern"></div>
+    <div class="page-wrapper">
+        <!-- Header -->
+        <header>
+            <div class="logo">
+                <i class="fas fa-project-diagram logo-icon"></i>
+                <h1>Project Flowchart</h1>
+            </div>
+            <div class="header-buttons">
+                <a href="/explanation" class="return-button" title="Return to Documentation">
+                    <i class="fas fa-book" aria-hidden="true"></i>
+                    <span class="sr-only">Return to Docs</span>
+                </a>
+                <button class="theme-toggle" id="themeToggle" title="Toggle Theme">
+                    <i class="fas fa-moon" aria-hidden="true"></i>
+                    <span class="sr-only">Toggle Theme</span>
+                </button>
+            </div>
+        </header>
+
+        <div class="content-wrapper">
+            <main class="main-content">
+                <div class="container">
+                    <section id="flowchart-section" class="section">
+                        <div class="section-header">
+                            <i class="fas fa-sitemap" aria-hidden="true"></i>
+                            <h2>Application Workflow</h2>
+                        </div>
+                        <p>Visualize the step-by-step process. Select a flow and use the navigation controls on the right.</p>
+
+                        <!-- New Layout Container -->
+                        <div class="flowchart-layout">
+                            <!-- Flowchart Diagram Area (Scrollable) -->
+                            <div class="flowchart-diagram-wrapper">
+                                <div class="flowchart-diagram" id="flowchartDiagram">
+                                    <div class="flowchart-lane" id="lane-ui"><h4><i class="fas fa-desktop"></i> UI (index.html)</h4></div>
+                                    <div class="flowchart-lane" id="lane-api"><h4><i class="fas fa-server"></i> API (app/routes/api.py)</h4></div>
+                                    <div class="flowchart-lane" id="lane-core"><h4><i class="fas fa-cogs"></i> Core (app/core/steganography.py)</h4></div>
+                                </div>
+                            </div>
+                            <!-- Info and Controls Area (Sticky) -->
+                            <div class="flowchart-info-wrapper">
+                                <div class="flowchart-controls">
+                                    <button class="flow-button active" data-flow="hide"><i class="fas fa-eye-slash"></i> Hide Flow</button>
+                                    <button class="flow-button" data-flow="extract"><i class="fas fa-search"></i> Extract Flow</button>
+                                </div>
+                                <div class="flowchart-step-info" id="flowchartStepInfo">
+                                    <h3>Step Information</h3>
+                                    <p id="stepDescription">Select a flow (Hide or Extract) and use the navigation buttons below.</p>
+                                </div>
+                                <div class="flowchart-navigation">
+                                    <button id="prevStepButton" class="secondary" disabled><i class="fas fa-arrow-left"></i> Previous</button>
+                                    <span id="stepCounter">Step 0 / 0</span>
+                                    <button id="nextStepButton" disabled><i class="fas fa-arrow-right"></i> Next</button>
+                                </div>
+                            </div>
+                        </div> <!-- End flowchart-layout -->
+                    </section>
+                </div>
+            </main>
+        </div>
+        <!-- Footer -->
+        <footer>
+            <div class="footer-content">
+                <p>Secure Message Steganography Flowchart © 2024</p>
+                <div class="footer-links">
+                   <a href="/explanation"><i class="fas fa-book-open" aria-hidden="true"></i> Documentation</a>
+                   <a href="/demos"><i class="fas fa-flask" aria-hidden="true"></i> Demos</a>
+                   <a href="/resources"><i class="fas fa-book-reader" aria-hidden="true"></i> Resources</a>
+                   <a href="/quiz"><i class="fas fa-question-circle" aria-hidden="true"></i> Quiz</a>
+                </div>
+            </div>
+        </footer>
+    </div> <!-- End Page Wrapper -->
+    <button id="backToTop" class="back-to-top" title="Back to Top">
+        <i class="fas fa-arrow-up" aria-hidden="true"></i><span class="sr-only">Back to Top</span>
+    </button>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/toolbar/prism-toolbar.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/copy-to-clipboard/prism-copy-to-clipboard.min.js"></script>
+    <script>
+        // --- Standard Theme/Scroll JS ---
+        (function() {
+            const htmlElement = document.documentElement;
+            const themeToggle = document.getElementById('themeToggle');
+            const backToTopButton = document.getElementById('backToTop');
+            const prismDarkThemeLink = document.getElementById('prism-dark-theme');
+            const prismLightThemeLink = document.getElementById('prism-light-theme');
+            const themeIcon = themeToggle?.querySelector('i');
+
+            const applyTheme = (theme) => {
+                htmlElement.setAttribute('data-theme', theme);
+                htmlElement.classList.toggle('light-mode', theme === 'light');
+                if (themeIcon) {
+                    themeIcon.className = `fas ${theme === 'dark' ? 'fa-moon' : 'fa-sun'}`;
+                    themeToggle.title = theme === 'dark' ? "Activate Light Mode" : "Activate Dark Mode";
+                }
+                if (prismDarkThemeLink) prismDarkThemeLink.disabled = (theme !== 'dark');
+                if (prismLightThemeLink) prismLightThemeLink.disabled = (theme === 'dark');
+                if (typeof Prism !== 'undefined') setTimeout(() => Prism.highlightAll(), 0);
+            };
+            const toggleTheme = () => {
+                const newTheme = (htmlElement.getAttribute('data-theme') || 'dark') === 'dark' ? 'light' : 'dark';
+                localStorage.setItem('theme', newTheme); applyTheme(newTheme);
+            };
+            const checkSystemPreference = () => localStorage.getItem('theme') || 'dark';
+            const handleScroll = () => { if (backToTopButton) backToTopButton.classList.toggle('show', window.pageYOffset > 300); };
+            themeToggle?.addEventListener('click', toggleTheme);
+            backToTopButton?.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+            window.addEventListener('scroll', handleScroll, { passive: true });
+            document.addEventListener('DOMContentLoaded', () => { applyTheme(checkSystemPreference()); if (typeof Prism !== 'undefined') Prism.highlightAll(); handleScroll(); initFlowchart(); });
+        })();
+
+        // --- Flowchart Logic ---
+        const flowchartDiagram = document.getElementById('flowchartDiagram');
+        const laneUI = document.getElementById('lane-ui');
+        const laneAPI = document.getElementById('lane-api');
+        const laneCore = document.getElementById('lane-core');
+        const stepInfoCard = document.getElementById('flowchartStepInfo');
+        const stepDescriptionEl = document.getElementById('stepDescription');
+        const stepInfoTitleEl = stepInfoCard.querySelector('h3');
+        const prevStepButton = document.getElementById('prevStepButton');
+        const nextStepButton = document.getElementById('nextStepButton');
+        const stepCounterEl = document.getElementById('stepCounter');
+        const flowButtons = document.querySelectorAll('.flow-button');
+        const diagramWrapper = document.querySelector('.flowchart-diagram-wrapper');
+
+        let currentFlow = 'hide'; let currentStepIndex = -1; let flows = {};
+
+        function defineFlows() { // Same flow definitions as before
+            flows = {
+                 hide: [
+                    { id: 'h-ui-1', lane: 'ui', type: 'user-input', icon: 'fa-mouse-pointer', text: 'User selects Cover Image & enters Secret Message + Key', description: "The process starts in the <strong>User Interface (<code>index.html</code>)</strong>. The user uploads a cover image (any format - PNG, JPEG, WEBP, HEIC, AVIF, TIFF, BMP, GIF, and more), types their secret message, and either generates or provides a 256-bit AES key." },
+                    { id: 'h-ui-2', lane: 'ui', type: 'user-input', icon: 'fa-toggle-on', text: 'User configures Settings (AES, Embed Key, etc.)', description: "User selects advanced options like enabling/disabling <strong>AES encryption</strong>, choosing whether to <strong>embed the key</strong> within the image, and selecting LSB strategies (<strong>Enhanced Bit/Adaptive Channel</strong>, <strong>Error Correction</strong>)." },
+                    { id: 'h-ui-3', lane: 'ui', type: 'user-input', icon: 'fa-play-circle', text: 'User clicks "Hide Message"', description: "The user initiates the hiding process by clicking the button. The UI gathers all inputs (image data, message, key, settings)." },
+                    { id: 'h-api-1', lane: 'api', type: 'api-process', icon: 'fa-paper-plane', text: 'UI sends data to Backend API (/api/hide_message)', description: "The frontend JavaScript packages the cover image (as Base64), message, key (hex), and settings into a JSON payload and sends it via a <strong>POST request</strong> to the Flask backend at the <code>/api/hide_message</code> endpoint (handled by <code>app/routes/api.py</code>)." },
+                    { id: 'h-api-2', lane: 'api', type: 'api-process', icon: 'fa-save', text: 'API saves Cover Image temporarily', description: "The Flask backend (<code>app/routes/api.py</code>) receives the request, decodes the Base64 image data, and saves the cover image to a <strong>temporary file</strong> on the server for processing." },
+                    { id: 'h-api-3', lane: 'api', type: 'api-process', icon: 'fa-cogs', text: 'API calls Core Logic `hide_message` function', description: "The API endpoint validates the inputs and then calls the main <code>hide_message</code> function within the <strong>Core Logic module (<code>app/core/steganography.py</code>)</strong>, passing the paths to the temporary cover image, the desired output path, the message, key, and all selected options." },
+                    { id: 'h-core-1', lane: 'core', type: 'core-process', icon: 'fa-lock', text: 'Core: Encrypt Message (AES-256 + IV)', description: "Inside <code>app/core/steganography.py</code>, if AES is enabled, the message is encoded to bytes, a random <strong>Initialization Vector (IV)</strong> is generated, and the message is encrypted using <strong>AES-256</strong> in CBC mode with the provided key. The IV is prepended to the ciphertext." },
+                    { id: 'h-core-2', lane: 'core', type: 'core-process', icon: 'fa-key', text: 'Core: Encrypt/Prepare Key (if embedding)', description: "If key embedding is enabled, the AES key itself is <strong>encrypted</strong> using a 'master key' derived from specific pixels of the cover image. This encrypted key is prepared for embedding." },
+                    { id: 'h-core-3', lane: 'core', type: 'core-process', icon: 'fa-th', text: 'Core: Assemble Payload (Header + Key? + Msg)', description: "A payload is constructed including a <strong>header</strong> (marker for embedded key, message length, possibly key length), the optional encrypted key, and the (possibly AES-encrypted) message. The entire payload is converted to a <strong>binary string</strong> (0s and 1s)." },
+                    { id: 'h-core-4', lane: 'core', type: 'core-process', icon: 'fa-paint-brush', text: 'Core: Embed binary data using LSB (Simple/Enhanced)', description: "The core logic iterates through the cover image pixels. Based on the selected strategy (<strong>Simple LSB</strong> or <strong>Enhanced/Adaptive LSB</strong>), it modifies the Least Significant Bits of the chosen color channels (R, G, B) to match the bits of the binary payload." },
+                    { id: 'h-core-5', lane: 'core', type: 'core-process', icon: 'fa-check-double', text: 'Core: Calculate Metrics (PSNR, SSIM, BER)', description: "After embedding, the modified image array is compared to the original cover image array to calculate quality and error metrics: <strong>PSNR</strong> (Peak Signal-to-Noise Ratio), <strong>SSIM</strong> (Structural Similarity Index), and <strong>BER</strong> (Bit Error Rate)." },
+                    { id: 'h-api-4', lane: 'api', type: 'api-process', icon: 'fa-file-export', text: 'API receives results & returns Stego Image', description: "The Core Logic returns the calculated metrics and the modified pixel data. The API (<code>app/routes/api.py</code>) saves it as a lossless PNG in a temporary working directory, reads it back as Base64, and returns it directly in the JSON response - nothing is persisted to disk long-term; the temporary file is deleted once the response is sent." },
+                    { id: 'h-api-5', lane: 'api', type: 'api-process', icon: 'fa-reply', text: 'API sends response to UI (Image + Metrics)', description: "The API reads the final stego image, encodes it to <strong>Base64</strong>, and sends a JSON response back to the UI containing the Base64 image data, the calculated metrics (PSNR, SSIM, BER, Capacity), and the saved file path." },
+                    { id: 'h-ui-4', lane: 'ui', type: 'output', icon: 'fa-image', text: 'UI displays Stego Image & Metrics', description: "The frontend JavaScript receives the successful response, displays the generated <strong>stego image preview</strong>, updates the <strong>performance metrics display</strong>, and shows the path where the image was saved." },
+                ],
+                 extract: [
+                    { id: 'e-ui-1', lane: 'ui', type: 'user-input', icon: 'fa-upload', text: 'User selects Stego Image', description: "The user uploads the image file (any format the browser recognizes as an image is accepted) that contains the hidden message using the file input area in the <strong>User Interface (<code>index.html</code>)</strong>." },
+                    { id: 'e-ui-2', lane: 'ui', type: 'user-input', icon: 'fa-key', text: 'User provides Key (if not embedded)', description: "If the key was <strong>NOT</strong> embedded during the hiding process, the user must provide the correct 256-bit AES key (usually as a 64-character hex string) in the key input field." },
+                     { id: 'e-ui-3', lane: 'ui', type: 'user-input', icon: 'fa-toggle-on', text: 'User configures Settings (AES, Enhanced)', description: "User ensures the settings (Use AES, Enhanced Bit, Adaptive Channel) match those used during the hiding process. The 'Embed Key' toggle effectively tells the system *whether to attempt* extraction." },
+                    { id: 'e-ui-4', lane: 'ui', type: 'user-input', icon: 'fa-play-circle', text: 'User clicks "Extract Message"', description: "The user initiates the extraction process. The UI gathers the stego image data and the (optional) key." },
+                    { id: 'e-api-1', lane: 'api', type: 'api-process', icon: 'fa-paper-plane', text: 'UI sends data to Backend API (/api/extract_message)', description: "The frontend JavaScript sends the stego image (as Base64) and the optionally provided key to the Flask backend via a <strong>POST request</strong> to the <code>/api/extract_message</code> endpoint (handled by <code>app/routes/api.py</code>)." },
+                    { id: 'e-api-2', lane: 'api', type: 'api-process', icon: 'fa-save', text: 'API saves Stego Image temporarily', description: "The Flask backend (<code>app/routes/api.py</code>) saves the received stego image to a <strong>temporary file</strong> for processing." },
+                    { id: 'e-api-3', lane: 'api', type: 'api-process', icon: 'fa-cogs', text: 'API calls Core Logic `extract_message` function', description: "The API endpoint calls the <code>extract_message</code> function in the <strong>Core Logic module (<code>app/core/steganography.py</code>)</strong>, passing the path to the temporary stego image, the provided key (which might be None), and the relevant settings." },
+                    { id: 'e-core-1', lane: 'core', type: 'core-process', icon: 'fa-search-plus', text: 'Core: Extract LSB data based on strategy', description: "Inside <code>app/core/steganography.py</code>, the logic reads the Least Significant Bits from the image pixels according to the specified strategy (<strong>Simple LSB</strong> or <strong>Enhanced/Adaptive LSB</strong>)." },
+                    { id: 'e-core-2', lane: 'core', type: 'core-process', icon: 'fa-file-alt', text: 'Core: Parse Header (Marker, Lengths)', description: "The initial bits extracted are parsed to find the <strong>header</strong>. This includes checking the <strong>key marker</strong> (to determine if a key is embedded) and reading the <strong>message length</strong>." },
+                    { id: 'e-core-3', lane: 'core', type: 'core-process', icon: 'fa-key', text: 'Core: Extract & Decrypt Key (if embedded)', description: "If the marker indicates an embedded key and extraction is requested, the logic reads the key length, extracts the encrypted key data, derives the 'master key' from image pixels, and attempts to <strong>decrypt the embedded AES key</strong>." },
+                    { id: 'e-core-4', lane: 'core', type: 'core-process', icon: 'fa-stream', text: 'Core: Extract Message Payload (Binary)', description: "Using the determined message length, the remaining LSBs corresponding to the message payload are extracted, forming the complete binary representation of the (potentially encrypted) message." },
+                    { id: 'e-core-5', lane: 'core', type: 'core-process', icon: 'fa-unlock-alt', text: 'Core: Decode & Decrypt Message (if AES)', description: "The extracted binary message data is converted back to text (likely Base64). If AES was used, the correct key (either extracted or provided) is used to <strong>decrypt the data</strong> using AES-256 CBC (removing the IV and padding)." },
+                     { id: 'e-core-6', lane: 'core', type: 'core-process', icon: 'fa-check', text: 'Core: Apply Error Correction / Finalize', description: "If error correction was used (and AES was off), the logic attempts to correct errors (e.g., using majority voting for repeated characters). The final plaintext message is decoded (e.g., UTF-8)." },
+                    { id: 'e-api-4', lane: 'api', type: 'api-process', icon: 'fa-reply', text: 'API receives results from Core Logic', description: "The Core Logic returns the extracted message (or an error) and potentially the extracted key back to the API endpoint in <code>app/routes/api.py</code>." },
+                    { id: 'e-api-5', lane: 'api', type: 'api-process', icon: 'fa-check-circle', text: 'API sends response to UI (Message, Key?)', description: "The API formats the result into a JSON response and sends it back to the UI, including the extracted message and any extracted key data." },
+                    { id: 'e-ui-5', lane: 'ui', type: 'output', icon: 'fa-comment-dots', text: 'UI displays Extracted Message & Key (if found)', description: "The frontend JavaScript receives the response and displays the <strong>extracted message</strong> in the designated text area. If a key was successfully extracted from the image, it is also displayed." },
+                ]
+            };
+        }
+        function renderFlowchart() {
+            laneUI.innerHTML = '<h4><i class="fas fa-desktop"></i> UI (index.html)</h4>';
+            laneAPI.innerHTML = '<h4><i class="fas fa-server"></i> API (app/routes/api.py)</h4>';
+            laneCore.innerHTML = '<h4><i class="fas fa-cogs"></i> Core (app/core/steganography.py)</h4>';
+            const steps = flows[currentFlow]; if (!steps) return;
+            steps.forEach((step, index) => {
+                const node = document.createElement('div');
+                node.className = `flowchart-node ${step.type}`; node.id = step.id;
+                node.dataset.index = index; node.innerHTML = `<i class="fas ${step.icon}"></i><span>${step.text}</span>`;
+                if (index === steps.length - 1) node.classList.add('last-node');
+                if (step.lane === 'ui') laneUI.appendChild(node); else if (step.lane === 'api') laneAPI.appendChild(node); else if (step.lane === 'core') laneCore.appendChild(node);
+                node.addEventListener('click', () => setActiveStep(index));
+            });
+             currentStepIndex = -1; setActiveStep(0); diagramWrapper.scrollTop = 0;
+        }
+        function setActiveStep(index) {
+            const steps = flows[currentFlow]; const totalSteps = steps ? steps.length : 0;
+             if (index >= totalSteps) index = totalSteps - 1; if (index < -1) index = -1; currentStepIndex = index;
+            document.querySelectorAll('.flowchart-node.active').forEach(n => n.classList.remove('active'));
+             if (currentStepIndex === -1) {
+                 stepInfoTitleEl.textContent = "Step Information"; stepDescriptionEl.innerHTML = "Select a flow and use navigation."; stepCounterEl.textContent = `Step 0 / ${totalSteps}`;
+             } else {
+                 const currentStepData = steps[currentStepIndex]; const activeNode = document.getElementById(currentStepData.id);
+                 if (activeNode) { activeNode.classList.add('active'); activeNode.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' }); } // Adjusted scroll
+                 stepInfoTitleEl.textContent = `Step ${currentStepIndex + 1}: ${currentStepData.text}`; stepDescriptionEl.innerHTML = currentStepData.description; stepCounterEl.textContent = `Step ${currentStepIndex + 1} / ${totalSteps}`;
+             }
+             updateNavigation();
+        }
+        function updateNavigation() { const steps = flows[currentFlow]; const totalSteps = steps ? steps.length : 0; prevStepButton.disabled = currentStepIndex <= 0; nextStepButton.disabled = currentStepIndex >= totalSteps - 1 || currentStepIndex === -1; }
+        function handleFlowSelection(event) { if (event.target.classList.contains('active')) return; flowButtons.forEach(btn => btn.classList.remove('active')); event.target.classList.add('active'); currentFlow = event.target.dataset.flow; renderFlowchart(); }
+        function handlePrevStep() { if (currentStepIndex > 0) setActiveStep(currentStepIndex - 1); }
+        function handleNextStep() { const steps = flows[currentFlow]; const totalSteps = steps ? steps.length : 0; if (currentStepIndex < totalSteps - 1) setActiveStep(currentStepIndex + 1); }
+        function initFlowchart() { defineFlows(); flowButtons.forEach(button => button.addEventListener('click', handleFlowSelection)); prevStepButton.addEventListener('click', handlePrevStep); nextStepButton.addEventListener('click', handleNextStep); renderFlowchart(); }
+    </script>
+</body>
+</html>

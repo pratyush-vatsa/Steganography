@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glossary of Terms - Secure Steganography</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css" rel="stylesheet" id="prism-dark-theme" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" rel="stylesheet" id="prism-light-theme" disabled />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/toolbar/prism-toolbar.min.css" rel="stylesheet" />
+
+    <!-- Full CSS from other pages -->
+    <style>
+        /* --- Base & Variables --- */
+        :root {
+            --primary: #4f46e5;
+            --primary-light: #818cf8;
+            --primary-dark: #3730a3;
+            --secondary: #06b6d4;
+            --accent: #f472b6;
+            --dark: #1e293b; /* Dark text / Light BG element */
+            --light: #f8fafc; /* Light text / Dark BG element */
+            --bg-light: #f8fafc;
+            --bg-dark: #0f172a;
+            --card-bg-light: rgba(255, 255, 255, 0.95);
+            --card-bg-dark: rgba(30, 41, 59, 0.9);
+            --card-border-light: rgba(79, 70, 229, 0.1);
+            --card-border-dark: rgba(129, 140, 248, 0.15);
+            --code-bg-light: #f8f8f2;
+            --code-bg-dark: #282a36;
+            --input-bg: rgba(255, 255, 255, 0.05);
+            --input-text: var(--light);
+            --border-color: var(--card-border-dark); /* Default dark */
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --gradient: linear-gradient(135deg, var(--primary), var(--secondary));
+            --text-light: #64748b;
+            --text-dark: var(--dark);
+            --warning: #f97316;
+            --error: #ef4444;
+            --success: #22c55e;
+            --medium-text: #a0a0b0;
+            --button-radius: 8px;
+            --card-radius: 12px;
+            --transition: all 0.3s ease-in-out;
+            --header-height: 80px;
+        }
+        /* --- Dark Mode Overrides --- */
+        html[data-theme="dark"] {
+            --primary: #818cf8; --primary-light: #a5b4fc; --primary-dark: #6366f1; --secondary: #22d3ee; --accent: #f9a8d4; --dark: #f8fafc; --light: #0f172a; --bg-main: var(--bg-dark); --text-main: var(--dark); --text-muted: #94a3b8; --card-bg: var(--card-bg-dark); --card-border: var(--card-border-dark); --code-bg: var(--code-bg-dark); --container-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.3); --warning: #fb923c; --error: #f87171; --success: #4ade80; --input-bg: rgba(255, 255, 255, 0.05); --input-text: var(--light); --border-color: var(--card-border-dark); --medium-text: #94a3b8;
+        }
+         /* Light Mode Explicit Overrides */
+         html[data-theme="light"] {
+             --primary: #6366f1; --primary-light: #818cf8; --secondary: #06b6d4; --accent: #f472b6; --dark: #1e293b; --light: #f8fafc; --bg-main: var(--bg-light); --text-main: var(--text-dark); --text-muted: var(--text-light); --card-bg: var(--card-bg-light); --card-border: var(--card-border-light); --code-bg: var(--code-bg-light); --input-bg: rgba(241, 245, 249, 0.9); --input-text: #334155; --border-color: var(--card-border-light); --medium-text: #64748b; --warning: #f97316; --error: #ef4444; --success: #22c55e; --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+         }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; scroll-padding-top: calc(var(--header-height) + 20px); }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-main); color: var(--text-main); font-size: 16px; line-height: 1.7; transition: background-color 0.4s ease, color 0.4s ease; overflow-x: hidden; }
+        .page-wrapper { display: flex; flex-direction: column; min-height: 100vh; }
+        .content-wrapper { flex: 1; }
+        .main-content { flex: 1; padding: 0 2rem; max-width: 1000px; margin: 0 auto; } /* Max width adjusted */
+        .container { width: 100%; margin: 0 auto; }
+        .bg-pattern { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; opacity: 0.05; pointer-events: none; background-image: radial-gradient(var(--primary) 0.5px, transparent 0.5px); background-size: 25px 25px; transition: opacity 0.4s ease; }
+        html[data-theme="dark"] .bg-pattern { opacity: 0.07; background-image: radial-gradient(var(--primary-light) 0.5px, transparent 0.5px); }
+        header { padding: 1.5rem 2rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background-color: var(--card-bg); backdrop-filter: blur(12px); z-index: 50; transition: background-color 0.4s ease, border-color 0.4s ease; height: var(--header-height); }
+        .logo { display: flex; align-items: center; gap: 1rem; }
+        .logo h1 { font-size: 1.8rem; font-weight: 700; background: var(--gradient); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .logo-icon { font-size: 2rem; color: var(--primary); animation: pulse 2.5s infinite ease-in-out; }
+        .header-buttons { display: flex; gap: 0.8rem; align-items: center; }
+        .theme-toggle { background: transparent; border: 1px solid var(--border-color); color: var(--medium-text); padding: 0.6rem 1.1rem; border-radius: 50px; cursor: pointer; display: flex; align-items: center; gap: 0.6rem; font-weight: 500; transition: all 0.3s ease; font-size: 0.9rem; }
+        .theme-toggle:hover { color: var(--primary); border-color: var(--primary); background-color: rgba(79, 70, 229, 0.05); }
+        html[data-theme="dark"] .theme-toggle:hover { background-color: rgba(129, 140, 248, 0.08); }
+        .theme-toggle i { width: 1em; text-align: center; }
+        .return-button { display: inline-flex; align-items: center; gap: 0.6rem; background: transparent; border: 1px solid var(--border-color); color: var(--medium-text); padding: 0.6rem 1.1rem; border-radius: 50px; text-decoration: none; font-weight: 500; transition: all 0.3s ease; font-size: 0.9rem; }
+        .return-button:hover { color: var(--secondary); border-color: var(--secondary); background-color: rgba(6, 182, 212, 0.05); }
+        html[data-theme="dark"] .return-button:hover { background-color: rgba(34, 211, 238, 0.08); }
+        .return-button i { font-size: 0.9em; }
+        .section { padding: 2.5rem; margin: 2.5rem 0; background: var(--card-bg); border-radius: 1rem; box-shadow: var(--shadow-md); transition: all 0.4s ease; border: 1px solid var(--border-color); }
+        .section-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem;}
+        .section-header h2 { font-size: 2rem; font-weight: 700; color: var(--primary); margin: 0; }
+        .section-header i { font-size: 1.5rem; color: var(--primary); background-color: rgba(79, 70, 229, 0.1); width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        html[data-theme="dark"] .section-header i { background-color: rgba(129, 140, 248, 0.15); }
+        .section > p:first-of-type { font-size: 1.1rem; color: var(--text-muted); margin-bottom: 1.5rem; }
+        footer { margin-top: 6rem; text-align: center; padding: 3rem 2rem; color: var(--text-muted); opacity: 0.9; font-size: 0.95rem; border-top: 1px solid var(--border-color); background-color: var(--card-bg); transition: background-color 0.4s ease, border-color 0.4s ease; }
+        .footer-content { max-width: 800px; margin: 0 auto; }
+        .footer-links { display: flex; justify-content: center; gap: 2rem; margin-top: 1rem; flex-wrap: wrap; }
+        .footer-links a { color: var(--text-muted); text-decoration: none; transition: color 0.3s ease; display: inline-flex; align-items: center; gap: 0.5rem; }
+        .footer-links a:hover { color: var(--primary); }
+        .footer-links a i { margin-right: 0.5em; }
+        .back-to-top { position: fixed; bottom: 30px; right: 30px; width: 50px; height: 50px; border-radius: 50%; background: var(--primary); color: white; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: all 0.4s ease; transform: translateY(100px) scale(0.8); opacity: 0; border: none; box-shadow: var(--shadow-lg); z-index: 100; font-size: 1.2rem; }
+        .back-to-top.show { transform: translateY(0) scale(1); opacity: 1; }
+        .back-to-top:hover { background: var(--primary-light); transform: translateY(-5px) scale(1.05); }
+        .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0; }
+        @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.05); opacity: 0.9; } 100% { transform: scale(1); opacity: 1; } }
+
+        /* === GLOSSARY SPECIFIC STYLES === */
+        .glossary-list {
+            margin-top: 2rem;
+        }
+
+        .glossary-list dt {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: var(--primary-light);
+            margin-top: 1.8rem;
+            margin-bottom: 0.6rem;
+            padding-bottom: 0.4rem;
+            border-bottom: 1px dashed var(--border-color);
+        }
+        html[data-theme="light"] .glossary-list dt {
+             color: var(--primary-dark);
+        }
+
+
+        .glossary-list dt:first-of-type {
+            margin-top: 0;
+        }
+
+        .glossary-list dd {
+            margin-left: 1rem; /* Indent definition */
+            color: var(--text-muted);
+            font-size: 1rem;
+            line-height: 1.7;
+        }
+
+         .glossary-list dd + dt { /* Add more space before the next term */
+            margin-top: 2.5rem;
+         }
+
+         .glossary-list code {
+             background-color: var(--input-bg);
+             padding: 0.2em 0.4em;
+             border-radius: 4px;
+             font-size: 0.9em;
+             font-family: 'Fira Code', monospace;
+             color: var(--accent);
+             border: 1px solid var(--border-color);
+        }
+         .glossary-list strong {
+             color: var(--text-main);
+             font-weight: 500;
+         }
+
+    </style>
+</head>
+<body>
+    <div class="bg-pattern"></div>
+    <div class="page-wrapper">
+        <!-- Header -->
+        <header>
+            <div class="logo">
+                <i class="fas fa-book logo-icon"></i> <!-- Changed icon -->
+                <h1>Glossary of Terms</h1>
+            </div>
+            <div class="header-buttons">
+                <a href="/explanation" class="return-button" title="Return to Documentation">
+                    <i class="fas fa-book" aria-hidden="true"></i>
+                    <span class="sr-only">Return to Docs</span>
+                </a>
+                <button class="theme-toggle" id="themeToggle" title="Toggle Theme">
+                    <i class="fas fa-moon" aria-hidden="true"></i>
+                    <span class="sr-only">Toggle Theme</span>
+                </button>
+            </div>
+        </header>
+
+        <div class="content-wrapper">
+            <main class="main-content">
+                <div class="container">
+                    <section id="glossary-section" class="section">
+                        <div class="section-header">
+                            <i class="fas fa-spell-check"></i>
+                            <h2>Glossary</h2>
+                        </div>
+                        <p>Definitions for key terms used in steganography and this project.</p>
+
+                        <dl class="glossary-list">
+                            <dt id="term-adaptive-channel">Adaptive Channel Selection</dt>
+                            <dd>A steganographic technique (used in this project's 'Enhanced' mode) where the choice of color channels (R, G, B) for embedding data within a pixel depends on the pixel's characteristics, such as its intensity (brightness). Aims to improve imperceptibility.</dd>
+
+                            <dt id="term-aes">AES (Advanced Encryption Standard)</dt>
+                            <dd>A strong, widely adopted symmetric block cipher encryption algorithm. This project uses AES-256 (a key size of 256 bits) to encrypt the secret message before embedding, providing confidentiality.</dd>
+
+                            <dt id="term-base64">Base64</dt>
+                            <dd>An encoding scheme that represents binary data (like encrypted messages or IVs) using only printable ASCII characters. Used in this project to ensure encrypted data can be safely converted to a binary string for embedding.</dd>
+
+                            <dt id="term-ber">BER (Bit Error Rate)</dt>
+                            <dd>A metric indicating the number of errors in the extracted bits compared to the originally embedded bits, divided by the total number of bits. Ideally, BER should be 0 for lossless steganography and transmission. A higher BER indicates data corruption.</dd>
+
+                            <dt id="term-bpp">BPP (Bits Per Pixel)</dt>
+                            <dd>A measure of payload capacity in image steganography, indicating the average number of secret bits hidden within each pixel of the cover image.</dd>
+
+                            <dt id="term-capacity">Capacity</dt>
+                            <dd>The maximum amount of data that can be hidden within a specific cover medium using a particular steganographic technique. Often measured in bits or bytes, or BPP for images.</dd>
+
+                            <dt id="term-cbc">CBC (Cipher Block Chaining)</dt>
+                            <dd>A mode of operation for block ciphers like AES. Each block of plaintext is XORed with the previous ciphertext block before encryption, requiring an Initialization Vector (IV) for the first block. This ensures identical plaintext blocks produce different ciphertext blocks.</dd>
+
+                            <dt id="term-cover-medium">Cover Medium</dt>
+                            <dd>The non-secret file (e.g., image, audio) used to conceal the secret message. Also called the cover file or cover object.</dd>
+
+                            <dt id="term-cryptography">Cryptography</dt>
+                            <dd>The practice and study of techniques for secure communication in the presence of adversaries. Focuses on confidentiality (preventing reading), integrity (preventing alteration), authentication, etc. Often used alongside steganography.</dd>
+
+                            <dt id="term-dct">DCT (Discrete Cosine Transform)</dt>
+                            <dd>A mathematical transform used heavily in lossy compression algorithms like JPEG. Some steganographic techniques hide data by modifying DCT coefficients in the frequency domain.</dd>
+
+                            <dt id="term-dwt">DWT (Discrete Wavelet Transform)</dt>
+                            <dd>Another mathematical transform that decomposes a signal into different frequency components (wavelets). Used in some compression standards and frequency-domain steganography techniques, often offering good robustness.</dd>
+
+                            <dt id="term-embed-key">Embed Key</dt>
+                            <dd>An optional feature in this project where the AES encryption key itself is hidden (after being encrypted with a derived 'master key') within the stego image header. Simplifies key distribution but relies on the security of the master key derivation.</dd>
+
+                            <dt id="term-enhanced-bit">Enhanced Bit Distribution</dt>
+                            <dd>Refers to strategies, like Adaptive Channel Selection used in this project, that embed data in a non-uniform way based on cover medium properties, aiming to reduce statistical detectability compared to simple sequential embedding.</dd>
+
+                            <dt id="term-error-correction">Error Correction</dt>
+                            <dd>Techniques used to add redundancy to data so that some errors introduced during transmission or storage (or minor image manipulation) can be detected and potentially corrected during extraction. This project mentions simple repetition as an optional method.</dd>
+
+                            <dt id="term-frequency-domain">Frequency Domain</dt>
+                            <dd>A representation of a signal (like an image) based on its frequency components rather than its spatial (pixel) values. Steganography in this domain modifies these frequency components (e.g., DCT or DWT coefficients).</dd>
+
+                            <dt id="term-header">Header (Steganographic)</dt>
+                            <dd>Metadata embedded at the beginning of the hidden payload within the stego medium. Typically contains information needed for extraction, such as the total payload length, flags (like whether a key is embedded), etc.</dd>
+
+                            <dt id="term-hexadecimal">Hexadecimal (Hex)</dt>
+                            <dd>A base-16 number system using digits 0-9 and letters A-F. Often used as a compact, human-readable representation of binary data, such as encryption keys.</dd>
+
+                            <dt id="term-imperceptibility">Imperceptibility</dt>
+                            <dd>The quality of steganography where the hidden data causes no statistically or perceptually noticeable changes to the cover medium. High imperceptibility makes detection harder.</dd>
+
+                            <dt id="term-iv">IV (Initialization Vector)</dt>
+                            <dd>A random or pseudo-random block of data used with certain block cipher modes (like CBC) to ensure that encrypting the same plaintext multiple times produces different ciphertexts. It does not need to be secret but must be unique for each encryption with the same key.</dd>
+
+                            <dt id="term-lsb">LSB (Least Significant Bit)</dt>
+                            <dd>The rightmost bit in the binary representation of a number (e.g., a pixel color value). It has the smallest impact on the overall value. LSB steganography modifies these bits to hide data.</dd>
+
+                            <dt id="term-lossless">Lossless Compression</dt>
+                            <dd>Data compression techniques (e.g., used in PNG, BMP, FLAC) that allow the original data to be perfectly reconstructed from the compressed data. Essential for preserving LSB steganography.</dd>
+
+                            <dt id="term-lossy">Lossy Compression</dt>
+                            <dd>Data compression techniques (e.g., used in JPEG, MP3) that discard some data (usually information less perceptible to humans) to achieve higher compression ratios. **Destructive** to LSB steganography.</dd>
+
+                            <dt id="term-padding">Padding (Cryptographic)</dt>
+                            <dd>Adding extra bytes to the end of a message before block cipher encryption to ensure the message length is an exact multiple of the cipher's block size (e.g., 16 bytes for AES). Must be removed unambiguously after decryption.</dd>
+
+                            <dt id="term-payload">Payload</dt>
+                            <dd>The actual secret data (including any headers, IVs, encrypted keys, and the message itself) that is embedded within the cover medium.</dd>
+
+                            <dt id="term-psnr">PSNR (Peak Signal-to-Noise Ratio)</dt>
+                            <dd>A metric used to measure the quality of reconstruction of lossy compression codecs or, in steganography, the level of distortion introduced by embedding data. Measured in decibels (dB). Higher values generally indicate less distortion and better visual quality.</dd>
+
+                            <dt id="term-robustness">Robustness</dt>
+                            <dd>The ability of the hidden data to survive modifications or processing applied to the stego medium, such as compression, filtering, resizing, or noise addition.</dd>
+
+                            <dt id="term-spatial-domain">Spatial Domain</dt>
+                            <dd>Representation of an image directly by its pixel values and their locations. LSB modification operates in the spatial domain.</dd>
+
+                            <dt id="term-ssim">SSIM (Structural Similarity Index Measure)</dt>
+                            <dd>A metric for measuring the perceived similarity between two images (e.g., the original cover and the stego image). It considers luminance, contrast, and structure. Values range from -1 to 1, where 1 indicates identical images.</dd>
+
+                            <dt id="term-steganalysis">Steganalysis</dt>
+                            <dd>The field dedicated to detecting the presence of hidden messages embedded using steganography. Aims to distinguish stego media from original cover media.</dd>
+
+                            <dt id="term-steganography">Steganography</dt>
+                            <dd>The practice of concealing a message, image, or file within another message, image, or file. Its primary goal is secrecy – hiding the fact that communication occurred.</dd>
+
+                            <dt id="term-stego-medium">Stego Medium</dt>
+                            <dd>The cover medium after the secret payload has been embedded within it. Also called the stego file or stego object.</dd>
+
+                        </dl>
+
+                    </section>
+                </div>
+            </main>
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <div class="footer-content">
+                <p>Steganography Glossary © 2024</p>
+                <div class="footer-links">
+                   <a href="/explanation"><i class="fas fa-book-open" aria-hidden="true"></i> Documentation</a>
+                   <a href="/demos"><i class="fas fa-flask" aria-hidden="true"></i> Demos</a>
+                   <a href="/flowchart"><i class="fas fa-sitemap" aria-hidden="true"></i> Flowchart</a>
+                   <a href="/resources"><i class="fas fa-book-reader" aria-hidden="true"></i> Resources</a>
+                   <a href="/quiz"><i class="fas fa-question-circle" aria-hidden="true"></i> Quiz</a>
+                   <a href="/security-guide"><i class="fas fa-user-shield" aria-hidden="true"></i> Security Guide</a>
+                </div>
+            </div>
+        </footer>
+    </div> <!-- End Page Wrapper -->
+
+    <button id="backToTop" class="back-to-top" title="Back to Top">
+        <i class="fas fa-arrow-up" aria-hidden="true"></i><span class="sr-only">Back to Top</span>
+    </button>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/toolbar/prism-toolbar.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/copy-to-clipboard/prism-copy-to-clipboard.min.js"></script>
+    <script>
+        // --- Standard Theme/Scroll JS ---
+        (function() { // IIFE
+             const htmlElement = document.documentElement;
+             const themeToggle = document.getElementById('themeToggle');
+             const backToTopButton = document.getElementById('backToTop');
+             const prismDarkThemeLink = document.getElementById('prism-dark-theme');
+             const prismLightThemeLink = document.getElementById('prism-light-theme');
+             const themeIcon = themeToggle?.querySelector('i');
+
+             const applyTheme = (theme) => {
+                 htmlElement.setAttribute('data-theme', theme);
+                 htmlElement.classList.toggle('light-mode', theme === 'light');
+                 if (themeIcon) {
+                     themeIcon.className = `fas ${theme === 'dark' ? 'fa-moon' : 'fa-sun'}`;
+                     themeToggle.title = theme === 'dark' ? "Activate Light Mode" : "Activate Dark Mode";
+                 }
+                 if (prismDarkThemeLink) prismDarkThemeLink.disabled = (theme !== 'dark');
+                 if (prismLightThemeLink) prismLightThemeLink.disabled = (theme === 'dark');
+                 if (typeof Prism !== 'undefined') setTimeout(() => Prism.highlightAll(), 0);
+             };
+             const toggleTheme = () => { const newTheme = (htmlElement.getAttribute('data-theme') || 'dark') === 'dark' ? 'light' : 'dark'; localStorage.setItem('theme', newTheme); applyTheme(newTheme); };
+             const checkSystemPreference = () => localStorage.getItem('theme') || 'dark'; // Default dark
+             const handleScroll = () => { if (backToTopButton) backToTopButton.classList.toggle('show', window.pageYOffset > 300); };
+
+             themeToggle?.addEventListener('click', toggleTheme);
+             backToTopButton?.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+             window.addEventListener('scroll', handleScroll, { passive: true });
+
+             document.addEventListener('DOMContentLoaded', () => { applyTheme(checkSystemPreference()); if (typeof Prism !== 'undefined') Prism.highlightAll(); handleScroll(); });
+         })();
+    </script>
+</body>
+</html>

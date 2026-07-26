@@ -1,0 +1,27 @@
+; systemd unit for running the app persistently on any Linux VM (e.g.
+; Google Cloud's Always Free e2-micro instance, Oracle Cloud, or any VPS).
+; Nothing in this file is provider-specific.
+;
+; Install:
+;   sudo cp deploy/stego.service /etc/systemd/system/stego.service
+;   sudo systemctl daemon-reload
+;   sudo systemctl enable --now stego
+;
+; Adjust User, WorkingDirectory, and the venv path below to match your
+; actual deployment location on the VM.
+
+[Unit]
+Description=Stego Flask application (gunicorn)
+After=network.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/home/ubuntu/stego-app
+EnvironmentFile=/home/ubuntu/stego-app/.env
+ExecStart=/home/ubuntu/stego-app/venv/bin/gunicorn run:app --workers 2 --timeout 120 --bind 127.0.0.1:8000
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

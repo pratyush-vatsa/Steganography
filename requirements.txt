@@ -1,0 +1,13 @@
+# Pinned to known-compatible versions for reproducible installs.
+# After installing and testing on your deployment target, you can
+# regenerate exact pins with: pip freeze > requirements.txt
+Flask==3.0.3
+python-dotenv==1.0.1
+gunicorn==22.0.0
+Pillow==12.3.0
+pillow-heif==1.5.0
+numpy==1.26.4
+pycryptodome==3.20.0
+matplotlib==3.9.0
+scikit-image==0.24.0
+pandas==2.2.2

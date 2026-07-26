@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resource Library - Secure Steganography</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css" rel="stylesheet" id="prism-dark-theme" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" rel="stylesheet" id="prism-light-theme" disabled />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/toolbar/prism-toolbar.min.css" rel="stylesheet" />
+
+    <!-- Full CSS from other pages -->
+    <style>
+        /* --- Base & Variables --- */
+        :root {
+            --primary: #4f46e5;
+            --primary-light: #818cf8;
+            --primary-dark: #3730a3;
+            --secondary: #06b6d4;
+            --accent: #f472b6;
+            --dark: #1e293b; /* Dark text / Light BG element */
+            --light: #f8fafc; /* Light text / Dark BG element */
+            --bg-light: #f8fafc;
+            --bg-dark: #0f172a;
+            --card-bg-light: rgba(255, 255, 255, 0.95);
+            --card-bg-dark: rgba(30, 41, 59, 0.9); /* Slightly less transparent */
+            --card-border-light: rgba(79, 70, 229, 0.1);
+            --card-border-dark: rgba(129, 140, 248, 0.15);
+            --code-bg-light: #f8f8f2; /* Light theme code background */
+            --code-bg-dark: #282a36; /* Dark theme code background (Okaidia-like) */
+            --input-bg: rgba(255, 255, 255, 0.05); /* For dark mode input */
+             --input-text: var(--light); /* For dark mode input */
+             --border-color: var(--card-border-dark); /* Default to dark */
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --container-shadow: var(--shadow-xl);
+            --gradient: linear-gradient(135deg, var(--primary), var(--secondary));
+            --text-light: #64748b; /* Lighter text for secondary info */
+            --text-dark: var(--dark);
+            --warning: #f97316; /* Orange for warnings */
+            --error: #ef4444; /* Red for errors/low robustness */
+            --success: #22c55e; /* Green for success/good */
+            --medium-text: #a0a0b0; /* Added for consistency */
+            --button-radius: 8px;
+            --card-radius: 12px;
+            --transition: all 0.3s ease-in-out;
+
+            /* Tag Colors (Light Mode) */
+            --tag-bg-default: rgba(79, 70, 229, 0.1);
+            --tag-text-default: var(--primary);
+            --tag-bg-security: hsla(0, 84%, 60%, 0.1);    /* Reddish */
+            --tag-text-security: hsl(0, 74%, 50%);
+            --tag-bg-advanced: hsla(270, 80%, 65%, 0.1);  /* Purplish */
+            --tag-text-advanced: hsl(270, 70%, 55%);
+            --tag-bg-encryption: hsla(217, 91%, 60%, 0.1); /* Blueish */
+            --tag-text-encryption: hsl(217, 81%, 50%);
+            --tag-bg-quality: hsla(145, 63%, 49%, 0.1);  /* Greenish */
+            --tag-text-quality: hsl(145, 58%, 39%);
+            --tag-bg-convenience: hsla(48, 96%, 59%, 0.1);/* Yellowish */
+            --tag-text-convenience: hsl(48, 90%, 45%);
+            --tag-bg-analysis: hsla(210, 40%, 50%, 0.1);  /* Grey-Blue */
+            --tag-text-analysis: hsl(210, 30%, 40%);
+            --tag-technique: var(--tag-bg-advanced); --tag-text-technique: var(--tag-text-advanced);
+             --tag-lsb: var(--tag-bg-encryption); --tag-text-lsb: var(--tag-text-encryption);
+             --tag-frequency: var(--tag-bg-quality); --tag-text-frequency: var(--tag-text-quality);
+             --tag-robustness: var(--tag-bg-analysis); --tag-text-robustness: var(--tag-text-analysis);
+             --tag-capacity: var(--tag-bg-convenience); --tag-text-capacity: var(--tag-text-convenience);
+             --tag-steganalysis: var(--tag-bg-security); --tag-text-steganalysis: var(--tag-text-security);
+             --tag-survey: var(--tag-bg-analysis); --tag-text-survey: var(--tag-text-analysis);
+             --tag-image: var(--tag-bg-default); --tag-text-image: var(--tag-text-default);
+             --tag-audio: var(--tag-bg-convenience); --tag-text-audio: var(--tag-text-convenience);
+             --tag-video: var(--tag-bg-advanced); --tag-text-video: var(--tag-text-advanced);
+             --tag-text: var(--tag-bg-default); --tag-text-text: var(--tag-text-default);
+             --tag-tool: var(--tag-bg-quality); --tag-text-tool: var(--tag-text-quality);
+             --tag-python: var(--tag-bg-encryption); --tag-text-python: var(--tag-text-encryption);
+             --tag-open-source: var(--tag-bg-quality); --tag-text-open-source: var(--tag-text-quality);
+             --tag-compression-issues: var(--tag-bg-error); --tag-text-compression-issues: var(--tag-text-error); /* Example error tag */
+             --tag-countermeasure: var(--tag-bg-success); --tag-text-countermeasure: var(--tag-text-success); /* Example success tag */
+             --tag-overview: var(--tag-bg-analysis); --tag-text-overview: var(--tag-text-analysis);
+             --tag-comparison: var(--tag-bg-convenience); --tag-text-comparison: var(--tag-text-convenience);
+             --tag-terminology: var(--tag-bg-default); --tag-text-terminology: var(--tag-text-default);
+             --tag-trade-off: var(--tag-bg-warning); --tag-text-trade-off: var(--tag-text-warning); /* Example warning tag */
+             --tag-detection: var(--tag-bg-security); --tag-text-detection: var(--tag-text-security);
+             --tag-core-concept: var(--tag-bg-primary); --tag-text-core-concept: var(--tag-text-primary); /* Example primary tag */
+
+            /* Default to light mode */
+            --bg-main: var(--bg-light);
+            --text-main: var(--text-dark);
+            --text-muted: var(--text-light);
+            --card-bg: var(--card-bg-light);
+            --card-border: var(--card-border-light);
+            --code-bg: var(--code-bg-light);
+        }
+
+        /* --- Dark Mode Overrides --- */
+        html[data-theme="dark"] {
+            --primary: #818cf8;
+            --primary-light: #a5b4fc;
+            --primary-dark: #6366f1;
+            --secondary: #22d3ee;
+            --accent: #f9a8d4;
+            --dark: #f8fafc; /* Dark text becomes light */
+            --light: #0f172a; /* Light text becomes dark */
+            --bg-main: var(--bg-dark);
+            --text-main: var(--dark); /* Use light text on dark bg */
+            --text-muted: #94a3b8; /* Adjusted muted text for dark */
+            --card-bg: var(--card-bg-dark);
+            --card-border: var(--card-border-dark);
+            --code-bg: var(--code-bg-dark);
+            --container-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.3);
+            --warning: #fb923c; /* Lighter orange */
+            --error: #f87171; /* Lighter red */
+            --success: #4ade80; /* Lighter green */
+            --input-bg: rgba(255, 255, 255, 0.05); /* Explicit dark input bg */
+            --input-text: var(--light); /* Explicit dark input text */
+             --border-color: var(--card-border-dark); /* Explicit dark border */
+             --medium-text: #94a3b8; /* Dark mode medium text (Adjusted) */
+
+             /* Tag Colors (Dark Mode) */
+            --tag-bg-default: rgba(129, 140, 248, 0.15);
+            --tag-text-default: var(--primary);
+            --tag-bg-security: hsla(0, 84%, 70%, 0.15);
+            --tag-text-security: hsl(0, 74%, 70%);
+            --tag-bg-advanced: hsla(270, 80%, 75%, 0.15);
+            --tag-text-advanced: hsl(270, 70%, 75%);
+            --tag-bg-encryption: hsla(217, 91%, 70%, 0.15);
+            --tag-text-encryption: hsl(217, 81%, 70%);
+            --tag-bg-quality: hsla(145, 63%, 59%, 0.15);
+            --tag-text-quality: hsl(145, 58%, 69%);
+            --tag-bg-convenience: hsla(48, 96%, 69%, 0.15);
+            --tag-text-convenience: hsl(48, 90%, 65%);
+             --tag-bg-analysis: hsla(210, 40%, 70%, 0.15);
+            --tag-text-analysis: hsl(210, 30%, 70%);
+             --tag-bg-error: hsla(0, 74%, 70%, 0.15); --tag-text-error: hsl(0, 74%, 70%);
+             --tag-bg-warning: hsla(39, 96%, 69%, 0.15); --tag-text-warning: hsl(39, 90%, 65%);
+             --tag-bg-success: hsla(145, 63%, 59%, 0.15); --tag-text-success: hsl(145, 58%, 69%);
+             --tag-bg-primary: rgba(129, 140, 248, 0.15); --tag-text-primary: var(--primary);
+        }
+         /* Light Mode Explicit Overrides */
+         html[data-theme="light"] {
+             --primary: #6366f1;
+             --primary-light: #818cf8;
+             --secondary: #06b6d4;
+             --accent: #f472b6;
+             --dark: #1e293b;
+             --light: #f8fafc;
+             --bg-main: var(--bg-light);
+             --text-main: var(--text-dark);
+             --text-muted: var(--text-light);
+             --card-bg: var(--card-bg-light);
+             --card-border: var(--card-border-light);
+             --code-bg: var(--code-bg-light);
+              --input-bg: rgba(241, 245, 249, 0.9);
+             --input-text: #334155;
+             --border-color: var(--card-border-light);
+             --medium-text: #64748b;
+             --warning: #f97316;
+             --error: #ef4444;
+             --success: #22c55e;
+             --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+             /* Light mode tag colors are already defined in :root */
+         }
+
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; scroll-padding-top: 100px; }
+        body {
+          font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+          background-color: var(--bg-main);
+          color: var(--text-main);
+          font-size: 16px;
+          line-height: 1.7;
+          transition: background-color 0.4s ease, color 0.4s ease;
+          overflow-x: hidden;
+        }
+        /* --- Layout & Container --- */
+        .page-wrapper { display: flex; flex-direction: column; min-height: 100vh; }
+        .content-wrapper { flex: 1; }
+        .main-content { flex: 1; padding: 0 2rem; max-width: 1200px; margin: 0 auto; }
+        .container { width: 100%; margin: 0 auto; }
+
+         /* --- Background Pattern --- */
+        .bg-pattern { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; opacity: 0.05; pointer-events: none; background-image: radial-gradient(var(--primary) 0.5px, transparent 0.5px); background-size: 25px 25px; transition: opacity 0.4s ease; }
+         html[data-theme="dark"] .bg-pattern { opacity: 0.07; background-image: radial-gradient(var(--primary-light) 0.5px, transparent 0.5px); }
+
+         /* --- Header --- */
+        header { padding: 1.5rem 2rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background-color: var(--card-bg); backdrop-filter: blur(12px); z-index: 50; transition: background-color 0.4s ease, border-color 0.4s ease; height: 80px; }
+        .logo { display: flex; align-items: center; gap: 1rem; }
+        .logo h1 { font-size: 1.8rem; font-weight: 700; background: var(--gradient); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .logo-icon { font-size: 2rem; color: var(--primary); animation: pulse 2.5s infinite ease-in-out; }
+        .header-buttons { display: flex; gap: 0.8rem; align-items: center; }
+
+        /* Theme Toggle Button */
+        .theme-toggle { background: transparent; border: 1px solid var(--border-color); color: var(--medium-text); padding: 0.6rem 1.1rem; border-radius: 50px; cursor: pointer; display: flex; align-items: center; gap: 0.6rem; font-weight: 500; transition: all 0.3s ease; font-size: 0.9rem; }
+        .theme-toggle:hover { color: var(--primary); border-color: var(--primary); background-color: rgba(79, 70, 229, 0.05); }
+        html[data-theme="dark"] .theme-toggle:hover { background-color: rgba(129, 140, 248, 0.08); }
+        .theme-toggle i { width: 1em; text-align: center; }
+
+        /* Return Button */
+        .return-button { display: inline-flex; align-items: center; gap: 0.6rem; background: transparent; border: 1px solid var(--border-color); color: var(--medium-text); padding: 0.6rem 1.1rem; border-radius: 50px; text-decoration: none; font-weight: 500; transition: all 0.3s ease; font-size: 0.9rem; }
+        .return-button:hover { color: var(--secondary); border-color: var(--secondary); background-color: rgba(6, 182, 212, 0.05); }
+        html[data-theme="dark"] .return-button:hover { background-color: rgba(34, 211, 238, 0.08); }
+        .return-button i { font-size: 0.9em; }
+
+        /* --- Sections (General) --- */
+        .section { padding: 2.5rem; margin: 2.5rem 0; background: var(--card-bg); border-radius: 1rem; box-shadow: var(--shadow-md); transition: all 0.4s ease; border: 1px solid var(--border-color); }
+        .section-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem;}
+        .section-header h2 { font-size: 2rem; font-weight: 700; color: var(--primary); margin: 0; }
+        .section-header i { font-size: 1.5rem; color: var(--primary); background-color: rgba(79, 70, 229, 0.1); width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        html[data-theme="dark"] .section-header i { background-color: rgba(129, 140, 248, 0.15); }
+        .section > p:first-of-type { font-size: 1.1rem; color: var(--text-muted); margin-bottom: 1.5rem; }
+
+        /* --- Footer --- */
+        footer { margin-top: 6rem; text-align: center; padding: 3rem 2rem; color: var(--text-muted); opacity: 0.9; font-size: 0.95rem; border-top: 1px solid var(--border-color); background-color: var(--card-bg); transition: background-color 0.4s ease, border-color 0.4s ease; }
+         .footer-content { max-width: 800px; margin: 0 auto; }
+         .footer-links { display: flex; justify-content: center; gap: 2rem; margin-top: 1rem; flex-wrap: wrap; }
+         .footer-links a { color: var(--text-muted); text-decoration: none; transition: color 0.3s ease; display: inline-flex; align-items: center; gap: 0.5rem; }
+         .footer-links a:hover { color: var(--primary); }
+         .footer-links a i { margin-right: 0.5em; }
+
+        /* --- Back to Top Button --- */
+        .back-to-top { position: fixed; bottom: 30px; right: 30px; width: 50px; height: 50px; border-radius: 50%; background: var(--primary); color: white; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: all 0.4s ease; transform: translateY(100px) scale(0.8); opacity: 0; border: none; box-shadow: var(--shadow-lg); z-index: 100; font-size: 1.2rem; }
+        .back-to-top.show { transform: translateY(0) scale(1); opacity: 1; }
+        .back-to-top:hover { background: var(--primary-light); transform: translateY(-5px) scale(1.05); }
+
+        /* === RESOURCE LIBRARY SPECIFIC STYLES === */
+        .resource-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .resource-card {
+            background-color: var(--input-bg); /* Use subtle input background */
+            border: 1px solid var(--border-color);
+            border-radius: var(--card-radius);
+            padding: 1.5rem;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column; /* Stack content */
+        }
+
+        .resource-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary-light);
+        }
+
+        .resource-card h3 {
+            font-size: 1.2rem;
+            color: var(--primary-light);
+            margin-bottom: 0.8rem;
+            font-weight: 600;
+        }
+
+         .resource-card h3 i {
+            margin-right: 0.6rem;
+            opacity: 0.8;
+         }
+
+
+        .resource-card p {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            flex-grow: 1; /* Allow description to take space */
+            margin-bottom: 1rem;
+        }
+         .resource-card .authors {
+             font-style: italic;
+             font-size: 0.9rem;
+             color: var(--medium-text);
+             margin-bottom: 1rem;
+         }
+
+        .resource-card a.resource-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--secondary);
+            text-decoration: none;
+            font-weight: 500;
+            margin-top: auto; /* Push link to bottom */
+            padding: 0.5rem 1rem;
+            border: 1px solid transparent;
+            border-radius: var(--button-radius);
+            transition: var(--transition);
+        }
+
+        .resource-card a.resource-link:hover {
+            color: var(--primary);
+            background-color: rgba(79, 70, 229, 0.1);
+            border-color: rgba(79, 70, 229, 0.2);
+        }
+         html[data-theme="dark"] .resource-card a.resource-link:hover {
+             background-color: rgba(129, 140, 248, 0.15);
+             border-color: rgba(129, 140, 248, 0.3);
+         }
+
+        .resource-card a.resource-link i {
+            transition: transform 0.3s ease;
+        }
+         .resource-card a.resource-link:hover i {
+             transform: translateX(3px);
+         }
+
+        .resource-card img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border: 1px solid var(--border-color);
+            background-color: var(--card-bg); /* Background for transparent images */
+        }
+
+        /* Tags */
+        .tags { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem; }
+        .tag { background-color: var(--tag-bg-default); color: var(--tag-text-default); padding: 0.35rem 0.8rem; border-radius: 50px; font-size: 0.8rem; font-weight: 500; border: 1px solid transparent; transition: all 0.2s ease; line-height: 1.4;}
+        .tag:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); filter: brightness(1.1); }
+        /* Specific Tag Colors */
+        .tag.security { background-color: var(--tag-bg-security); color: var(--tag-text-security); }
+        .tag.technique { background-color: var(--tag-bg-advanced); color: var(--tag-text-advanced); }
+        .tag.lsb { background-color: var(--tag-bg-encryption); color: var(--tag-text-encryption); }
+        .tag.frequency { background-color: var(--tag-bg-quality); color: var(--tag-text-quality); }
+        .tag.robustness { background-color: var(--tag-bg-analysis); color: var(--tag-text-analysis); }
+        .tag.capacity { background-color: var(--tag-bg-convenience); color: var(--tag-text-convenience); }
+        .tag.steganalysis { background-color: var(--tag-bg-security); color: var(--tag-text-security); }
+        .tag.survey { background-color: var(--tag-bg-analysis); color: var(--tag-text-analysis); }
+        .tag.image { background-color: var(--tag-bg-default); color: var(--tag-text-default); }
+        .tag.audio { background-color: var(--tag-bg-convenience); color: var(--tag-text-audio); }
+        .tag.video { background-color: var(--tag-bg-advanced); color: var(--tag-text-video); }
+        .tag.text { background-color: var(--tag-bg-default); color: var(--tag-text-text); }
+        .tag.tool { background-color: var(--tag-bg-quality); color: var(--tag-text-tool); }
+        .tag.python { background-color: var(--tag-bg-encryption); color: var(--tag-text-python); }
+        .tag.open-source { background-color: var(--tag-bg-quality); color: var(--tag-text-open-source); }
+        .tag.compression-issues { background-color: var(--tag-bg-error); color: var(--tag-text-error); }
+        .tag.countermeasure { background-color: var(--tag-bg-success); color: var(--tag-text-success); }
+        .tag.overview { background-color: var(--tag-bg-analysis); color: var(--tag-text-analysis); }
+        .tag.comparison { background-color: var(--tag-bg-convenience); color: var(--tag-text-comparison); }
+        .tag.terminology { background-color: var(--tag-bg-default); color: var(--tag-text-terminology); }
+        .tag.trade-off { background-color: var(--tag-bg-warning); color: var(--tag-text-warning); }
+        .tag.detection { background-color: var(--tag-bg-security); color: var(--tag-text-security); }
+        .tag.core-concept { background-color: var(--tag-bg-primary); color: var(--tag-text-primary); }
+
+        /* Responsive Resource Grid */
+        @media (max-width: 768px) {
+            .resource-grid { grid-template-columns: 1fr; }
+             header { padding: 1rem; }
+             .logo h1 { font-size: 1.5rem;}
+             .logo-icon { font-size: 1.8rem; }
+             .header-buttons { gap: 0.5rem; }
+             .return-button, .theme-toggle { padding: 0.5rem 0.8rem; font-size: 0.85rem; }
+             .section { padding: 1.5rem; margin: 1.5rem 0; }
+             .section-header h2 { font-size: 1.6rem; }
+             .section-header i { width: 40px; height: 40px; font-size: 1.2rem; }
+        }
+
+        /* Screen Reader only text */
+       .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0; }
+        @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.05); opacity: 0.9; } 100% { transform: scale(1); opacity: 1; } }
+    </style>
+</head>
+<body>
+    <div class="bg-pattern"></div>
+    <div class="page-wrapper">
+        <!-- Header -->
+        <header>
+            <div class="logo">
+                <i class="fas fa-book-reader logo-icon"></i> <!-- Changed icon -->
+                <h1>Resource Library</h1>
+            </div>
+            <div class="header-buttons">
+                <a href="/explanation" class="return-button" title="Return to Documentation">
+                    <i class="fas fa-book" aria-hidden="true"></i>
+                    <span class="sr-only">Return to Docs</span>
+                </a>
+                <button class="theme-toggle" id="themeToggle" title="Toggle Theme">
+                    <i class="fas fa-moon" aria-hidden="true"></i>
+                    <span class="sr-only">Toggle Theme</span>
+                </button>
+            </div>
+        </header>
+
+        <div class="content-wrapper">
+            <main class="main-content">
+                <div class="container">
+
+                    <!-- Key Concepts Section -->
+                    <section id="key-concepts" class="section">
+                        <div class="section-header">
+                            <i class="fas fa-lightbulb"></i><h2>Key Concepts</h2>
+                        </div>
+                        <p>Fundamental ideas in steganography and related fields.</p>
+                        <div class="resource-grid">
+                            <div class="resource-card">
+                                <h3><i class="fas fa-user-secret"></i> Steganography</h3>
+                                <p>The art and science of hiding information within other non-secret data (the "cover medium") to conceal the fact that communication is taking place.</p>
+                                <div class="tags"><span class="tag core-concept">Core Concept</span><span class="tag terminology">Terminology</span></div>
+                            </div>
+                            <div class="resource-card">
+                                <h3><i class="fas fa-eye-slash"></i> Steganalysis</h3>
+                                <p>The art and science of detecting the presence of hidden information embedded using steganography. It focuses on detection, not necessarily decoding.</p>
+                                <div class="tags"><span class="tag steganalysis">Detection</span><span class="tag terminology">Terminology</span></div>
+                            </div>
+                            <div class="resource-card">
+                                <h3><i class="fas fa-shield-alt"></i> Cover Medium</h3>
+                                <p>The non-secret data (e.g., image, audio file, video, text) used to hide the secret message. The choice of cover affects capacity and detectability.</p>
+                                <div class="tags"><span class="tag terminology">Terminology</span><span class="tag image">Image</span><span class="tag audio">Audio</span></div>
+                            </div>
+                            <div class="resource-card">
+                                <h3><i class="fas fa-balance-scale"></i> Capacity vs. Imperceptibility vs. Robustness</h3>
+                                <p>The fundamental trade-off in steganography: hiding more data (high capacity) often makes changes more detectable (low imperceptibility) and more fragile (low robustness).</p>
+                                <div class="tags"><span class="tag trade-off">Trade-off</span><span class="tag capacity">Capacity</span><span class="tag robustness">Robustness</span><span class="tag security">Security</span></div>
+                            </div>
+                            <div class="resource-card">
+                                <h3><i class="fas fa-lock"></i> Cryptography vs. Steganography</h3>
+                                <p>Cryptography scrambles data to make it unreadable without a key (focuses on confidentiality). Steganography hides the existence of data (focuses on secrecy/covertness). They are often used together.</p>
+                                <div class="tags"><span class="tag comparison">Comparison</span><span class="tag security">Security</span></div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Steganography Techniques Section -->
+                    <section id="techniques" class="section">
+                        <div class="section-header">
+                            <i class="fas fa-cogs"></i><h2>Common Techniques</h2>
+                        </div>
+                        <p>Overview of different methods used to embed data.</p>
+                         <div class="resource-grid">
+                            <div class="resource-card">
+                                <h3><i class="fas fa-th"></i> LSB Modification (Spatial Domain)</h3>
+                                <p>Least Significant Bit substitution. Replaces the last bit(s) of pixel data (or audio samples). High capacity, visually imperceptible at low payloads, but fragile and statistically detectable.</p>
+                                <div class="tags"><span class="tag technique">Technique</span><span class="tag lsb">LSB</span><span class="tag capacity">High Capacity</span><span class="tag robustness">Low Robustness</span><span class="tag image">Image</span><span class="tag audio">Audio</span></div>
+                            </div>
+                            <div class="resource-card">
+                                <h3><i class="fas fa-wave-square"></i> Frequency Domain Methods (DCT, DWT)</h3>
+                                <p>Embeds data by modifying coefficients after a frequency transform (e.g., Discrete Cosine Transform for JPEG, Discrete Wavelet Transform). Generally lower capacity but more robust against compression and some manipulations.</p>
+                                <div class="tags"><span class="tag technique">Technique</span><span class="tag frequency">Frequency</span><span class="tag robustness">Medium Robustness</span><span class="tag capacity">Low/Medium Capacity</span><span class="tag image">Image</span></div>
+                            </div>
+                             <div class="resource-card">
+                                <h3><i class="fas fa-palette"></i> Palette-Based Methods</h3>
+                                <p>For indexed-color images (like GIF). Data is hidden by changing the index pointers to point to similar colors in the palette or by reordering the palette itself.</p>
+                                <div class="tags"><span class="tag technique">Technique</span><span class="tag image">Image</span><span class="tag capacity">Variable Capacity</span></div>
+                            </div>
+                             <div class="resource-card">
+                                <h3><i class="fas fa-file-audio"></i> Audio Steganography</h3>
+                                <p>Techniques include LSB on audio samples, echo hiding (adding faint echoes), phase coding, and spread spectrum methods. Challenges include maintaining audio quality.</p>
+                                <div class="tags"><span class="tag technique">Technique</span><span class="tag audio">Audio</span><span class="tag robustness">Variable Robustness</span></div>
+                            </div>
+                              <div class="resource-card">
+                                <h3><i class="fas fa-video"></i> Video Steganography</h3>
+                                <p>Often combines image techniques (applied to frames) and audio techniques (applied to audio track). High capacity due to data volume, but compression is a major challenge.</p>
+                                <div class="tags"><span class="tag technique">Technique</span><span class="tag video">Video</span><span class="tag capacity">Very High Capacity</span><span class="tag compression-issues">Compression Issues</span></div>
+                            </div>
+                               <div class="resource-card">
+                                <h3><i class="fas fa-font"></i> Text Steganography (Linguistics)</h3>
+                                <p>Hides data by subtle changes in text formatting (whitespace, character encoding variations) or by altering word choices/syntax based on predefined rules (linguistic steganography).</p>
+                                <div class="tags"><span class="tag technique">Technique</span><span class="tag text">Text</span><span class="tag capacity">Low Capacity</span></div>
+                            </div>
+                        </div>
+                    </section>
+
+                     <!-- Research Papers Section -->
+                    <section id="papers" class="section">
+                        <div class="section-header">
+                            <i class="fas fa-scroll"></i><h2>Research Papers & Articles</h2>
+                        </div>
+                        <p>Academic resources for deeper understanding. (Note: Links are placeholders - find actual papers via search engines like Google Scholar).</p>
+                         <div class="resource-grid">
+                            <div class="resource-card">
+                                <h3><i class="fas fa-book-open"></i> A Survey of Steganography Techniques</h3>
+                                <p class="authors">Often found by searching for "Steganography Survey" or "Review of Steganography Techniques".</p>
+                                <p>These papers provide comprehensive overviews of various methods, their strengths, weaknesses, and common steganalysis approaches.</p>
+                                <div class="tags"><span class="tag survey">Survey</span><span class="tag technique">Overview</span></div>
+                                <a href="https://scholar.google.com/scholar?q=steganography+techniques+survey" target="_blank" rel="noopener noreferrer" class="resource-link"><i class="fas fa-search"></i> Find on Google Scholar</a>
+                            </div>
+                             <div class="resource-card">
+                                <h3><i class="fas fa-chart-bar"></i> Steganalysis of LSB Embedding in Images</h3>
+                                <p class="authors">Search for specific steganalysis methods like "Chi-Square Steganalysis", "RS Steganalysis", "Machine Learning Steganalysis".</p>
+                                <p>Focuses on methods used to detect LSB steganography, including statistical attacks (Chi-Square, RS analysis) and more advanced machine learning classifiers.</p>
+                                <div class="tags"><span class="tag steganalysis">Steganalysis</span><span class="tag lsb">LSB</span><span class="tag security">Security</span></div>
+                                <a href="https://scholar.google.com/scholar?q=lsb+steganalysis+techniques" target="_blank" rel="noopener noreferrer" class="resource-link"><i class="fas fa-search"></i> Find on Google Scholar</a>
+                            </div>
+                             <div class="resource-card">
+                                <h3><i class="fas fa-shield-virus"></i> Robust Steganography against Compression</h3>
+                                 <p class="authors">Look for papers on "Robust Image Steganography", "JPEG Steganography", "DWT Steganography".</p>
+                                <p>Explores techniques designed to survive lossy compression (like JPEG) and other common image manipulations, often using frequency domain methods.</p>
+                                <div class="tags"><span class="tag robustness">Robustness</span><span class="tag frequency">Frequency</span><span class="tag technique">Technique</span></div>
+                                <a href="https://scholar.google.com/scholar?q=robust+image+steganography+compression" target="_blank" rel="noopener noreferrer" class="resource-link"><i class="fas fa-search"></i> Find on Google Scholar</a>
+                            </div>
+                              <div class="resource-card">
+                                <h3><i class="fas fa-fingerprint"></i> Adaptive Steganography Methods</h3>
+                                 <p class="authors">Keywords: "Adaptive Steganography", "Content-Adaptive Steganography", "HUGO", "WOW".</p>
+                                <p>Discusses advanced techniques that adapt the embedding process based on the content of the cover image to minimize statistical detectability. Often involves complex cost functions.</p>
+                                <div class="tags"><span class="tag technique">Advanced</span><span class="tag security">Security</span><span class="tag countermeasure">Countermeasure</span></div>
+                                <a href="https://scholar.google.com/scholar?q=adaptive+steganography+methods" target="_blank" rel="noopener noreferrer" class="resource-link"><i class="fas fa-search"></i> Find on Google Scholar</a>
+                            </div>
+                        </div>
+                    </section>
+
+                     <!-- Diagrams/Visualizations Section -->
+                    <section id="diagrams" class="section">
+                        <div class="section-header">
+                            <i class="fas fa-image"></i><h2>Diagrams & Visualizations</h2>
+                        </div>
+                        <p>Illustrations explaining core concepts.</p>
+                         <div class="resource-grid">
+                            <div class="resource-card">
+                                <h3><i class="fas fa-th-large"></i> LSB Embedding Example</h3>
+                                
+                                <p>Visual representation showing how the least significant bits of pixel color values (RGB) are replaced with bits from the secret message.</p>
+                                <a href="/demos#lsb" class="resource-link"><i class="fas fa-flask"></i> See Interactive Demo</a>
+                            </div>
+                             <div class="resource-card">
+                                <h3><i class="fas fa-adjust"></i> Adaptive Channel Selection</h3>
+                                 
+                                <p>Diagram illustrating how pixel intensity (brightness) determines which color channels (R, G, or B) are selected for LSB modification in the 'Enhanced' strategy.</p>
+                                 <a href="/demos#adaptive" class="resource-link"><i class="fas fa-flask"></i> See Interactive Demo</a>
+                            </div>
+                              <div class="resource-card">
+                                <h3><i class="fas fa-project-diagram"></i> General Steganography Process</h3>
+                                 
+                                <p>A high-level flowchart showing the typical steps: selecting a cover, preparing the message (optional encryption), embedding, and transmitting the stego medium.</p>
+                                  <a href="/flowchart" class="resource-link"><i class="fas fa-sitemap"></i> See Project Flowchart</a>
+                            </div>
+                        </div>
+                    </section>
+
+                     <!-- Tools & Libraries Section -->
+                    <section id="tools" class="section">
+                        <div class="section-header">
+                            <i class="fas fa-tools"></i><h2>Tools & Libraries</h2>
+                        </div>
+                        <p>Software and code libraries related to steganography (examples only).</p>
+                         <div class="resource-grid">
+                            <div class="resource-card">
+                                <h3><i class="fab fa-python"></i> Stegano (Python Library)</h3>
+                                <p>A popular Python library providing basic LSB steganography functionalities for images and audio.</p>
+                                <div class="tags"><span class="tag tool">Tool/Library</span><span class="tag lsb">LSB</span><span class="tag python">Python</span></div>
+                                <a href="https://github.com/cedricbonhomme/Stegano" target="_blank" rel="noopener noreferrer" class="resource-link"><i class="fab fa-github"></i> View on GitHub</a>
+                            </div>
+                             <div class="resource-card">
+                                <h3><i class="fas fa-image"></i> StegSolve</h3>
+                                <p>A Java-based tool primarily used in CTFs (Capture The Flag competitions) for steganalysis, particularly LSB analysis and exploring image bit planes.</p>
+                                <div class="tags"><span class="tag tool">Tool</span><span class="tag steganalysis">Steganalysis</span><span class="tag lsb">LSB</span></div>
+                                <a href="https://github.com/zhengmin1989/StegSolve" target="_blank" rel="noopener noreferrer" class="resource-link"><i class="fab fa-github"></i> View on GitHub (Unofficial)</a>
+                            </div>
+                             <div class="resource-card">
+                                <h3><i class="fas fa-terminal"></i> OpenStego</h3>
+                                <p>Another open-source steganography tool offering various algorithms, including LSB and some password-based encryption.</p>
+                                <div class="tags"><span class="tag tool">Tool</span><span class="tag lsb">LSB</span><span class="tag open-source">Open Source</span></div>
+                                <a href="https://www.openstego.com/" target="_blank" rel="noopener noreferrer" class="resource-link"><i class="fas fa-external-link-alt"></i> Visit Website</a>
+                            </div>
+                        </div>
+                    </section>
+
+                </div> <!-- End Container -->
+            </main>
+        </div> <!-- End Content Wrapper -->
+
+        <!-- Footer -->
+        <footer>
+            <div class="footer-content">
+                <p>Steganography Resource Library © 2024</p>
+                <div class="footer-links">
+                   <a href="/explanation"><i class="fas fa-book-open" aria-hidden="true"></i> Documentation</a>
+                   <a href="/demos"><i class="fas fa-flask" aria-hidden="true"></i> Demos</a>
+                   <a href="/flowchart"><i class="fas fa-sitemap" aria-hidden="true"></i> Flowchart</a>
+                   <a href="/quiz"><i class="fas fa-question-circle" aria-hidden="true"></i> Quiz</a> <!-- Added Link -->
+                </div>
+            </div>
+        </footer>
+    </div> <!-- End Page Wrapper -->
+
+    <button id="backToTop" class="back-to-top" title="Back to Top">
+        <i class="fas fa-arrow-up" aria-hidden="true"></i><span class="sr-only">Back to Top</span>
+    </button>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/toolbar/prism-toolbar.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/copy-to-clipboard/prism-copy-to-clipboard.min.js"></script>
+    <script>
+        // --- Standard Theme/Scroll JS ---
+        (function() { // IIFE to avoid polluting global scope
+             const htmlElement = document.documentElement;
+             const themeToggle = document.getElementById('themeToggle');
+             const backToTopButton = document.getElementById('backToTop');
+             const prismDarkThemeLink = document.getElementById('prism-dark-theme');
+             const prismLightThemeLink = document.getElementById('prism-light-theme');
+             const themeIcon = themeToggle?.querySelector('i');
+
+             const applyTheme = (theme) => {
+                 htmlElement.setAttribute('data-theme', theme);
+                 htmlElement.classList.toggle('light-mode', theme === 'light');
+                 if (themeIcon) {
+                     themeIcon.className = `fas ${theme === 'dark' ? 'fa-moon' : 'fa-sun'}`;
+                     themeToggle.title = theme === 'dark' ? "Activate Light Mode" : "Activate Dark Mode";
+                 }
+                 if (prismDarkThemeLink) prismDarkThemeLink.disabled = (theme !== 'dark');
+                 if (prismLightThemeLink) prismLightThemeLink.disabled = (theme === 'dark');
+                 if (typeof Prism !== 'undefined') setTimeout(() => Prism.highlightAll(), 0);
+             };
+             const toggleTheme = () => { const newTheme = (htmlElement.getAttribute('data-theme') || 'dark') === 'dark' ? 'light' : 'dark'; localStorage.setItem('theme', newTheme); applyTheme(newTheme); };
+             const checkSystemPreference = () => localStorage.getItem('theme') || 'dark'; // Default dark
+             const handleScroll = () => { if (backToTopButton) backToTopButton.classList.toggle('show', window.pageYOffset > 300); };
+
+             themeToggle?.addEventListener('click', toggleTheme);
+             backToTopButton?.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+             window.addEventListener('scroll', handleScroll, { passive: true });
+
+             document.addEventListener('DOMContentLoaded', () => { applyTheme(checkSystemPreference()); if (typeof Prism !== 'undefined') Prism.highlightAll(); handleScroll(); });
+         })();
+    </script>
+</body>
+</html>
