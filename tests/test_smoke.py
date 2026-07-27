@@ -530,3 +530,78 @@ def test_wrong_key_does_not_produce_false_positive_mode_mismatch():
     extract_data = extract_resp.get_json()
     assert extract_data.get("success") is False
     assert not extract_data.get("modeMismatchDetected")
+
+
+def test_metrics_module_sanity():
+    """
+    Unit tests for the pure NumPy/SciPy PSNR/SSIM implementation that
+    replaced scikit-image (see app/core/metrics.py). Not a comparison
+    against scikit-image (that dependency is intentionally gone) - these
+    check the well-known mathematical properties any correct PSNR/SSIM
+    implementation must satisfy.
+    """
+    import numpy as np
+    from app.core.metrics import peak_signal_noise_ratio, structural_similarity
+
+    rng = np.random.default_rng(42)
+    a = (rng.random((100, 100, 3)) * 255).astype(np.float64)
+
+    # Identical images: PSNR is infinite, SSIM is exactly 1.
+    assert peak_signal_noise_ratio(a, a.copy()) == float("inf")
+    assert structural_similarity(a, a.copy(), channel_axis=2) == 1.0
+
+    # Small perturbation: PSNR should be high but finite, SSIM very close to 1.
+    b = a.copy()
+    b[0, 0, 0] = min(255, b[0, 0, 0] + 1)
+    psnr_val = peak_signal_noise_ratio(a, b)
+    ssim_val = structural_similarity(a, b, channel_axis=2)
+    assert 0 < psnr_val < float("inf")
+    assert 0.9 < ssim_val <= 1.0
+
+    # Large perturbation: both metrics should drop noticeably.
+    c = np.clip(a + rng.normal(0, 40, a.shape), 0, 255)
+    psnr_val2 = peak_signal_noise_ratio(a, c)
+    ssim_val2 = structural_similarity(a, c, channel_axis=2)
+    assert psnr_val2 < psnr_val
+    assert ssim_val2 < ssim_val
+
+
+def test_batch_graphs_generation_without_pandas():
+    """Regression test for the pandas -> plain-Python rewrite in
+    visualization.py: batch hide, then generate graphs from the results."""
+    client = make_client()
+    key = client.post("/api/generate_key").get_json()["key"]
+
+    resp = client.post(
+        "/api/batch_hide",
+        data={
+            "coverImages": [
+                (_make_image_bytes("PNG", size=(150, 150)), "a.png"),
+                (_make_image_bytes("PNG", size=(150, 150)), "b.png"),
+            ],
+            "message": "Graph generation regression test",
+            "key": key,
+            "useAES": "true",
+            "enhancedBit": "true",
+            "adaptiveChannel": "true",
+        },
+        content_type="multipart/form-data",
+    )
+    hide_data = resp.get_json()
+    assert hide_data.get("success")
+
+    results_payload = [
+        {
+            "filename": r["filename"],
+            "psnr": r["psnr"],
+            "ssim": r["ssim"],
+            "ber": r["ber"],
+            "capacity": r["capacity"],
+            "file_size": r["file_size"],
+        }
+        for r in hide_data["results"]
+    ]
+    resp2 = client.post("/api/batch_performance_graphs", json={"results": results_payload})
+    data2 = resp2.get_json()
+    assert data2.get("success")
+    assert len(data2.get("graphs", [])) == 3

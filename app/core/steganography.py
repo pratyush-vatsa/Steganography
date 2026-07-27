@@ -7,11 +7,15 @@ import base64
 import logging
 import os
 import secrets
-# Ensure scikit-image is installed: pip install scikit-image
+# PSNR/SSIM: implemented in-house (app/core/metrics.py) with pure
+# NumPy/SciPy instead of scikit-image - see that module's docstring for
+# why. scipy is a required dependency either way (it's what our own
+# implementation uses), so this doesn't add anything new, it just drops
+# scikit-image's much larger transitive dependency tree.
 try:
-    from skimage.metrics import peak_signal_noise_ratio, structural_similarity
+    from .metrics import peak_signal_noise_ratio, structural_similarity
 except ImportError:
-    logging.warning("scikit-image not found. PSNR and SSIM metrics will not be calculated.")
+    logging.warning("scipy not found. PSNR and SSIM metrics will not be calculated.")
     peak_signal_noise_ratio = None
     structural_similarity = None
 import string
@@ -465,7 +469,7 @@ def hide_message(cover_path, output_path, message, key,
 
     try:
         if peak_signal_noise_ratio is None or structural_similarity is None:
-            logger.warning("Skipping PSNR/SSIM calculation as scikit-image is not installed.")
+            logger.warning("Skipping PSNR/SSIM calculation as scipy is not installed.")
         else:
             # <-- MODIFICATION: Re-load the original image from disk for comparison -->
             # This avoids keeping a large copy in memory throughout the entire process.
