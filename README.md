@@ -8,6 +8,10 @@ AES-256 encryption and adaptive channel selection for better stealth.
 
 ![App screenshot](docs/images/app-screenshot.png)
 
+**Watch a full walkthrough (1:44, narrated):**
+
+https://github.com/user-attachments/assets/42165fc0-e46d-4db0-834a-c7e3c98777a9
+
 ## Features
 
 - **AES-256 encryption** over adaptive LSB steganography, with optional
