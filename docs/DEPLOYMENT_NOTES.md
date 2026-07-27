@@ -96,14 +96,14 @@ because e2-micro only has 1GB RAM.
 User=ubuntu
 WorkingDirectory=/home/ubuntu/stego-app
 EnvironmentFile=/home/ubuntu/stego-app/.env      <- easy to miss this one
-ExecStart=/home/ubuntu/stego-app/venv/bin/gunicorn run:app --workers 2 --timeout 120 --bind 127.0.0.1:8000
+ExecStart=/home/ubuntu/stego-app/venv/bin/gunicorn run:app --workers 1 --timeout 120 --bind 127.0.0.1:8000
 ```
 All four need your real username and path, e.g.:
 ```
 User=pratyushvatsa11
 WorkingDirectory=/home/pratyushvatsa11/Steganography
 EnvironmentFile=/home/pratyushvatsa11/Steganography/.env
-ExecStart=/home/pratyushvatsa11/Steganography/venv/bin/gunicorn run:app --workers 2 --timeout 120 --bind 127.0.0.1:8000
+ExecStart=/home/pratyushvatsa11/Steganography/venv/bin/gunicorn run:app --workers 1 --timeout 120 --bind 127.0.0.1:8000
 ```
 Missing the `EnvironmentFile` line specifically produces a vague
 `"Job for stego.service failed because of unavailable resources or another
@@ -124,6 +124,30 @@ If `sudo` itself starts refusing commands with an odd "insults" message,
 that's `sudo`'s built-in easter egg on an auth hiccup, not a real
 permissions problem - close the SSH tab and reopen a fresh session via the
 Console's SSH button.
+
+### This file gets overwritten back to the generic template on every future sync
+
+`deploy/stego.service` in the repo is a **template** - it doesn't know your
+real username or path. Every time you `git pull` and then `cp` it over the
+live systemd file again (e.g. to pick up an unrelated change like a
+`--workers` count adjustment), it silently wipes your customization back
+to `User=ubuntu` / `/home/ubuntu/stego-app`. Not a bug, just what "copying
+a version-controlled template" means - but easy to be caught out by.
+
+**Fix: always follow the `cp` with a `sed` that reapplies your values in
+the same step**, rather than reaching for `nano` again:
+```bash
+sudo cp deploy/stego.service /etc/systemd/system/stego.service
+sudo sed -i 's|/home/ubuntu/stego-app|/home/pratyushvatsa11/Steganography|g; s|User=ubuntu|User=pratyushvatsa11|' /etc/systemd/system/stego.service
+```
+Verify before restarting: `cat /etc/systemd/system/stego.service`.
+
+**Even simpler for a small, known change** (like a worker-count tweak):
+skip re-copying the template at all, and patch just that one line directly
+on the already-customized live file:
+```bash
+sudo sed -i 's/--workers 2/--workers 1/' /etc/systemd/system/stego.service
+```
 
 ## 6. nginx
 
@@ -298,4 +322,26 @@ run concurrently and combine to exceed available RAM.
 If you ever move to a VM with 2GB+ RAM, both of these can be relaxed back
 up - the numbers above scale linearly, so use them to size the limit for
 whatever host you're actually running on: `safe_MP ≈ (available_MB - 150) / 78`.
+
+## Alternative to all the memory tuning above: just upgrade the instance
+
+Everything in the incident above is about staying within e2-micro's 1GB
+RAM. If handling full-resolution photos matters more than staying on the
+free tier, upgrading the machine type sidesteps the tuning entirely - no
+rebuild needed, since it's the same instance, just resized:
+
+1. Compute Engine -> VM instances -> click the instance -> **Stop**
+2. **Edit** -> change **Machine type** to `e2-small` (2GB RAM) or
+   `e2-medium` (4GB RAM)
+3. **Start**
+4. Static IP, firewall rules, nginx config, and the SSL certificate are
+   all untouched - only revisit `.env`'s `MAX_IMAGE_MEGAPIXELS` and the
+   systemd `--workers` value to take advantage of the new headroom (use
+   the same `safe_MP` formula above), then `sudo systemctl restart stego`.
+
+This leaves GCP's Always Free tier - only `e2-micro` is free. Pricing
+sources disagreed with each other by a wide margin when checked (roughly
+$12-36/month for e2-small, $40-80/month for e2-medium, in us-central1) -
+check Google's own current pricing calculator for an exact figure rather
+than trusting either number here.
 
