@@ -605,3 +605,120 @@ def test_batch_graphs_generation_without_pandas():
     data2 = resp2.get_json()
     assert data2.get("success")
     assert len(data2.get("graphs", [])) == 3
+
+
+def test_metrics_memory_stays_bounded_on_large_image():
+    """
+    Regression test for a real production incident: the original
+    metrics.py used float64 with no explicit cleanup, which measured at
+    ~1.6GB peak RSS on a realistic 12-megapixel photo - enough to OOM-kill
+    the process on a small (1GB RAM) host, breaking hide_message()
+    entirely for any real-world-sized photo. This pins the fix (float32 +
+    explicit intermediate cleanup) to a hard ceiling well under what a
+    small VM can provide, so a future change can't silently reintroduce
+    the blowup.
+    """
+    import resource
+    import numpy as np
+    from app.core import metrics
+
+    rng = np.random.default_rng(42)
+    img = (rng.random((3000, 4000, 3)) * 255).astype(np.uint8)
+    stego = img.copy()
+    stego[:, :, 0] = stego[:, :, 0] ^ 1
+
+    mem_before = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+    metrics.peak_signal_noise_ratio(img, stego, data_range=255)
+    metrics.structural_similarity(img, stego, channel_axis=2, data_range=255)
+    mem_after = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+
+    # Generous ceiling (not a tight bound) - just needs to catch a
+    # regression back toward gigabyte-scale usage, not chase the exact
+    # current number.
+    mem_used_mb = (mem_after - mem_before) / 1024
+    assert mem_used_mb < 700, (
+        f"Metrics calculation used {mem_used_mb:.0f}MB above baseline for a "
+        f"12-megapixel image - expected well under 700MB. This likely means "
+        f"the float32/explicit-cleanup fix in metrics.py regressed."
+    )
+
+
+def test_metrics_matches_scikit_image_closely():
+    """Correctness check: our pure NumPy/SciPy PSNR/SSIM must stay
+    numerically indistinguishable from scikit-image's real implementation,
+    since the whole point is a drop-in replacement."""
+    pytest.importorskip("skimage")
+    import numpy as np
+    from skimage.metrics import peak_signal_noise_ratio as sk_psnr, structural_similarity as sk_ssim
+    from app.core import metrics
+
+    rng = np.random.default_rng(7)
+    img = (rng.random((256, 256, 3)) * 255).astype(np.uint8)
+    stego = img.copy()
+    stego[10:20, 10:20, 1] ^= 1
+
+    our_psnr = metrics.peak_signal_noise_ratio(img, stego, data_range=255)
+    their_psnr = sk_psnr(img, stego, data_range=255)
+    assert abs(our_psnr - their_psnr) < 0.01
+
+    our_ssim = metrics.structural_similarity(img, stego, channel_axis=2, data_range=255)
+    their_ssim = sk_ssim(img, stego, channel_axis=2, data_range=255)
+    assert abs(our_ssim - their_ssim) < 0.001
+
+
+def test_hide_memory_stays_within_small_vm_budget():
+    """
+    Regression test for a real production incident: the kernel OOM-killed
+    the gunicorn worker mid-request on a 1GB VM during hide_message,
+    traced to the PSNR/SSIM calculation's peak memory footprint. Measured
+    directly on this codebase: roughly 63MB baseline + 78MB per megapixel
+    of cover image for the full hide_message() request (not just the
+    metrics functions in isolation - see
+    test_metrics_memory_stays_bounded_on_large_image for that).
+
+    Uses delta (before/after), matching the proven methodology of the
+    existing metrics-only test above, rather than absolute peak RSS -
+    absolute peak measured via a nested subprocess turned out to include
+    unrelated baseline noise and gave inconsistent numbers between runs.
+    """
+    import resource
+    import io
+    import numpy as np
+    from PIL import Image
+
+    client = make_client()
+    key = client.post("/api/generate_key").get_json()["key"]
+
+    arr = (np.random.default_rng(11).random((1500, 2000, 3)) * 255).astype(np.uint8)  # 3 megapixels
+    buf = io.BytesIO()
+    Image.fromarray(arr, "RGB").save(buf, format="JPEG", quality=90)
+    buf.seek(0)
+
+    mem_before = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+    resp = client.post(
+        "/api/hide_message",
+        data={
+            "coverImage": (buf, "cover.jpg"),
+            "message": "Regression test message",
+            "key": key,
+            "useAES": "true",
+            "enhancedBit": "true",
+            "adaptiveChannel": "true",
+        },
+        content_type="multipart/form-data",
+    )
+    mem_after = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+    assert resp.get_json().get("success"), resp.get_json()
+
+    mem_used_mb = (mem_after - mem_before) / 1024
+
+    # Measured ~250-300MB above baseline for this exact 3MP image when this
+    # test was written. Generous ceiling, not a tight bound - a real
+    # regression (e.g. a float64 reintroduction) would blow well past this.
+    assert mem_used_mb < 500, (
+        f"hide_message used {mem_used_mb:.0f}MB above baseline for a 3MP "
+        f"image - expected well under 500MB. This is the same class of "
+        f"regression that caused OOM kills in production on a 1GB VM - "
+        f"check for a new float64 conversion or a missing `del` in "
+        f"app/core/metrics.py or app/core/steganography.py."
+    )

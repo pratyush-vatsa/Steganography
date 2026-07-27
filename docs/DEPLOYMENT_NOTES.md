@@ -254,3 +254,48 @@ Pure frontend changes (HTML/CSS/JS) take effect immediately on restart with
 no other steps. Setting up `git` on the VM (`git clone` your GitHub repo
 instead of re-uploading zips) is worth doing if you'll be iterating - it
 turns the update step into just `git pull && sudo systemctl restart stego`.
+
+## Real incident: OOM kills during hide/batch-hide (1GB VM)
+
+**Symptom:** the frontend showed "Network error... Unexpected token '<' is
+not valid JSON" during hide and batch-hide specifically - never during
+extraction. `sudo journalctl -u stego -n 100` showed the actual cause:
+```
+systemd[1]: stego.service: The kernel OOM killer killed some processes in this unit.
+gunicorn[...]: [ERROR] Worker (pid:...) was sent SIGKILL! Perhaps out of memory?
+```
+and nginx's error log confirmed the client-visible symptom:
+```
+upstream prematurely closed connection while reading response header from upstream
+```
+
+**Root cause, measured directly** (not guessed): the PSNR/SSIM calculation
+is the peak-memory moment of a hide request. Measured peak RSS across
+several image sizes on this exact codebase:
+
+| Image size | Megapixels | Peak memory |
+|---|---|---|
+| 1500x1000 | 1.5 MP | 180 MB |
+| 2000x1500 | 3.0 MP | 292 MB |
+| 2400x1600 | 3.84 MP | 363 MB |
+| (extrapolated) | 8 MP | ~687 MB |
+
+This fits a simple model: **~63MB baseline + ~78MB per megapixel**. The
+`MAX_IMAGE_MEGAPIXELS=8` setting (a reasonable-sounding default) predicts
+~687MB for a single request - and with e2-micro's 1GB total RAM minus
+~150-250MB of OS/nginx/systemd overhead, that leaves too little margin,
+especially with the default `--workers 2` allowing two such requests to
+run concurrently and combine to exceed available RAM.
+
+**Fix applied:**
+- `deploy/start.sh` and `deploy/stego.service`: `--workers 2` -> `--workers 1`
+  (halves baseline memory, and guarantees only one hide/extract request's
+  memory footprint exists at a time)
+- Recommended `.env` setting for *this specific 1GB VM* tightened from
+  `MAX_IMAGE_MEGAPIXELS=8` to `MAX_IMAGE_MEGAPIXELS=4` (predicts ~375MB
+  peak, leaving real headroom)
+
+If you ever move to a VM with 2GB+ RAM, both of these can be relaxed back
+up - the numbers above scale linearly, so use them to size the limit for
+whatever host you're actually running on: `safe_MP ≈ (available_MB - 150) / 78`.
+

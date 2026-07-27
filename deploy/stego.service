@@ -19,7 +19,7 @@ Type=simple
 User=ubuntu
 WorkingDirectory=/home/ubuntu/stego-app
 EnvironmentFile=/home/ubuntu/stego-app/.env
-ExecStart=/home/ubuntu/stego-app/venv/bin/gunicorn run:app --workers 2 --timeout 120 --bind 127.0.0.1:8000
+ExecStart=/home/ubuntu/stego-app/venv/bin/gunicorn run:app --workers 1 --timeout 120 --bind 127.0.0.1:8000
 Restart=on-failure
 RestartSec=5
 
